@@ -5,11 +5,14 @@ import datetime
 import google.generativeai as genai
 from parameters import *
 
+# Directory for storing experiment results
+RESULTS_DIR = "results_gemini"
+
 class ExperimentRunner:
     def __init__(self):
         """Initialize the experiment runner."""
         self._setup_api()
-        os.makedirs("results_gemini", exist_ok=True)
+        os.makedirs(RESULTS_DIR, exist_ok=True)
 
     def _setup_api(self):
         """Set up the Gemini API."""
@@ -45,7 +48,7 @@ Q4. 怒り:"""
             params: Dictionary containing experiment parameters
         """
         filename = f"{params['persona_key']}_{params['text_key']}_{params['model_key']}_n{params['trial']:02d}_temp{int(TEMPERATURE*100):02d}.txt"
-        filepath = os.path.join("results_gemini", filename)
+        filepath = os.path.join(RESULTS_DIR, filename)
         
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         content = f"""timestamp: {timestamp}
