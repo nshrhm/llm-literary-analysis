@@ -6,7 +6,8 @@ This research project evaluates the literary comprehension capabilities of vario
 
 The project currently supports the following LLM models:
 - Google Gemini
-- (Future planned support for OpenAI, Claude, GitHub Copilot, Deepseek, Grok)
+- Anthropic Claude
+- (Future planned support for OpenAI, GitHub Copilot, Deepseek, Grok)
 
 ## Features
 
@@ -18,7 +19,8 @@ The project currently supports the following LLM models:
 ## Requirements
 
 - Python 3.12
-- google-generativeai
+- google-generativeai (for Gemini models)
+- anthropic (for Claude models)
 - (Additional requirements will be added as more models are supported)
 
 ## Setup
@@ -36,13 +38,16 @@ pip install -r requirements.txt
 
 3. Configure environment variables:
 ```bash
-export GEMINI_API_KEY="your_api_key"
+export GEMINI_API_KEY="your_gemini_api_key"
+export ANTHROPIC_API_KEY="your_anthropic_api_key"
 ```
 
 ## Project Structure
 
 ```
 llm-literary-analysis/
+├── gemini_*.py        # Gemini model implementations
+├── claude_*.py        # Claude model implementations
 ├── results_gemini/    # Test results for Gemini models
 └── [Additional directories will be added for other models]
 ```
