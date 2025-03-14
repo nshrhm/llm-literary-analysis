@@ -25,7 +25,7 @@ The project currently supports the following LLM models:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/[username]/llm-literary-analysis.git
+git clone https://github.com/nshrhm/llm-literary-analysis.git
 cd llm-literary-analysis
 ```
 
