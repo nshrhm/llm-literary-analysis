@@ -1,0 +1,52 @@
+# Project Rules for MyApp
+
+## Development Environment
+- Windows Service for Linux on Windows11
+- Ubuntu 24.04
+
+## Programming Language
+- Python 3.12
+- The following Python modules are already installed.
+  - google-generativeai
+- Use Gemini's API Key from environment variables. Please refer to the code below.
+```python
+import os
+# Configure the API key
+GOOGLE_API_KEY = os.environ.get("GEMINI_API_KEY")
+```
+
+## Coding Standards
+- Use Python 3.12
+- Follow the PEP 8 – Style Guide for Python Code: https://peps.python.org/pep-0008/
+
+## Documentation
+
+- Ensure all code have clear and concise documentation.
+- Write comments for understanding the program at a level that first-year university students can understand.
+- Insert comments in doxygen format.
+
+## Testing
+
+- Write unit tests for all new features.
+
+## Security
+
+- Use Python's built-in security features.
+- Ensure all sensitive data is handled securely.
+
+## Version Control
+
+- Use Git for version control.
+- Follow Git best practices.
+
+## Code Review
+
+- Perform code reviews before merging into the main branch.
+- Ignore any files containing sensitive information like API keys.
+
+## Best Practices
+
+- Minimize the use of TODO comments; resolve them promptly.
+- Use meaningful variable and function names.
+- Use type hints for better code readability.
+- Use comments to explain complex logic.
