@@ -27,7 +27,7 @@ MODELS = {
 }
 
 # Experiment parameters
-TRIALS = 10
+TRIALS = 1
 TEMPERATURE = 0.5
 
 # Text content (from experiment.md)
