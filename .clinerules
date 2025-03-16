@@ -5,19 +5,28 @@
 -   `gemini_main.py` is the main script for running the experiment with Gemini models.
 -   `claude_check_model.py` and `gemini_check_model.py` are used to check the availability of the models.
 -   `parameters.py` defines the personas, texts, models, and experiment parameters.
+-   `process_results.py` is used for analyzing and processing experiment results.
 
 ## Project-Specific Patterns
 
 -   The project uses a modular architecture with separate scripts for each LLM.
 -   The prompts used for the LLMs are in Japanese.
--   The experiment results are saved to separate directories for each LLM (e.g., `results_gemini`).
+-   The experiment results are saved in both versioned (`01_results_gemini/`) and current (`results_gemini/`) directories.
+-   Results file naming follows the pattern: `p{persona_id}_t{text_id}_{model_name}_n{trial_number}_temp{temperature}.txt`
+    - persona_id: 1-4 (大学１年生、文学研究者、感情豊かな詩人、無感情なロボット)
+    - text_id: 1-3 (懐中時計、お金とピストル、ぼろぼろな駝鳥)
+    - model_name: gemini15f, gemini20pe, gemma30, etc.
+    - trial_number: 01, 02, etc.
+    - temperature: 50 (0.5), etc.
 
 ## Known Challenges
 
 -   API rate limits and costs may be a constraint when running the experiment.
 -   The availability of the LLM models may vary.
+-   Managing and comparing results across different model versions requires careful organization.
 
 ## Tool Usage Patterns
 
 -   `read_file` is used to read the contents of the existing files.
 -   `write_to_file` is used to create and update the memory bank files and the `.clinerules` file.
+-   Results are organized in versioned directories to maintain experiment history.
