@@ -1,52 +1,23 @@
-# Project Rules for MyApp
+# Project Intelligence
 
-## Development Environment
-- Windows Service for Linux on Windows11
-- Ubuntu 24.04
+## Key Implementation Paths
 
-## Programming Language
-- Python 3.12
-- The following Python modules are already installed.
-  - google-generativeai
-- Use Gemini's API Key from environment variables. Please refer to the code below.
-```python
-import os
-# Configure the API key
-GOOGLE_API_KEY = os.environ.get("GEMINI_API_KEY")
-```
+-   `gemini_main.py` is the main script for running the experiment with Gemini models.
+-   `claude_check_model.py` and `gemini_check_model.py` are used to check the availability of the models.
+-   `parameters.py` defines the personas, texts, models, and experiment parameters.
 
-## Coding Standards
-- Use Python 3.12
-- Follow the PEP 8 – Style Guide for Python Code: https://peps.python.org/pep-0008/
+## Project-Specific Patterns
 
-## Documentation
+-   The project uses a modular architecture with separate scripts for each LLM.
+-   The prompts used for the LLMs are in Japanese.
+-   The experiment results are saved to separate directories for each LLM (e.g., `results_gemini`).
 
-- Ensure all code have clear and concise documentation.
-- Write comments for understanding the program at a level that first-year university students can understand.
-- Insert comments in doxygen format.
+## Known Challenges
 
-## Testing
+-   API rate limits and costs may be a constraint when running the experiment.
+-   The availability of the LLM models may vary.
 
-- Write unit tests for all new features.
+## Tool Usage Patterns
 
-## Security
-
-- Use Python's built-in security features.
-- Ensure all sensitive data is handled securely.
-
-## Version Control
-
-- Use Git for version control.
-- Follow Git best practices.
-
-## Code Review
-
-- Perform code reviews before merging into the main branch.
-- Ignore any files containing sensitive information like API keys.
-
-## Best Practices
-
-- Minimize the use of TODO comments; resolve them promptly.
-- Use meaningful variable and function names.
-- Use type hints for better code readability.
-- Use comments to explain complex logic.
+-   `read_file` is used to read the contents of the existing files.
+-   `write_to_file` is used to create and update the memory bank files and the `.clinerules` file.
