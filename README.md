@@ -13,8 +13,14 @@ The project currently supports the following LLM models:
 
 - Systematic evaluation of LLM's literary analysis capabilities
 - Support for multiple LLM models
-- Detailed performance metrics and analysis
-- Comparative analysis across different models
+- Emotional analysis across four dimensions:
+  - Interest/Fun (面白さ)
+  - Surprise (驚き)
+  - Sadness (悲しみ)
+  - Anger (怒り)
+- Quantitative scoring (0-100) with detailed reasoning
+- Automated result aggregation and analysis
+- Comparative analysis across different models and personas
 
 ## Requirements
 
@@ -46,15 +52,51 @@ export ANTHROPIC_API_KEY="your_anthropic_api_key"
 
 ```
 llm-literary-analysis/
-├── gemini_*.py        # Gemini model implementations
-├── claude_*.py        # Claude model implementations
-├── results_gemini/    # Test results for Gemini models
-└── [Additional directories will be added for other models]
+├── gemini_*.py                    # Gemini model implementations
+├── claude_*.py                    # Claude model implementations
+├── parameters.py                  # Experiment parameters
+├── aggregate_experiment_results.py # Result analysis tool
+├── output/                        # Current experiment results
+└── results/                       # Versioned experiment results
 ```
 
 ## Usage
 
-Documentation for usage and example commands will be added soon.
+### Running Experiments
+
+1. Run experiments with Gemini models:
+```bash
+python gemini_main.py
+```
+
+2. Check model availability:
+```bash
+python gemini_check_model.py
+python claude_check_model.py
+```
+
+### Processing Results
+
+1. Aggregate results into CSV format:
+```bash
+python aggregate_experiment_results.py output/
+```
+
+The script will process all result files and generate a CSV file with:
+- Metadata (timestamp, model, persona, etc.)
+- Numerical evaluations (0-100 scores)
+- Reasoning for each evaluation
+
+### Result Format
+
+Each evaluation includes:
+```
+Q1. 面白さ(数値): [0-100]
+Q1. 面白さ(理由): [explanation]
+Q2. 驚き(数値): [0-100]
+Q2. 驚き(理由): [explanation]
+...
+```
 
 ## Contributing
 

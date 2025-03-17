@@ -7,7 +7,7 @@ import google.generativeai as genai
 from parameters import *
 
 # Directory for storing experiment results
-RESULTS_DIR = "results_gemini"
+RESULTS_DIR = "output"
 
 class ExperimentRunner:
     def __init__(self):
@@ -32,14 +32,26 @@ class ExperimentRunner:
         Returns:
             str: The generated prompt
         """
-        return f"""あなたは {persona} です。以下の文章を読んで得られた感情の強さを0から100の間の整数で答えてください。0はその感情が全くない状態、100はその感情が最も強い状態を表します。各感情について、値と理由を答えてください。
+        return f"""あなたは {persona} です。以下の文章を読み、それぞれの感情について、以下の定義と基準に従って0から100の間の整数で評価してください。0はその感情が全くない状態、100はその感情が最も強い状態を表します。そして、その感情の強さの理由を記述してください。
+
+* 感情の定義: 
+
+面白さ: 読んでいて楽しい、愉快だと感じる度合い（基準：物語のユーモラスな表現、意外性のある展開など）
+驚き: 予想外の展開や情報に触れ、心が動揺する度合い（基準：物語の展開の斬新さ、予想を裏切る展開など）
+悲しみ: 登場人物の心情に共感し、心が痛む度合い（基準：登場人物の心情への共感度合い、物語の結末など）
+怒り: 不当な行為や状況に対して、憤りを感じる度合い（基準：登場人物の行動への共感度合い、社会的なテーマへの共感度合い）
 
 {text_content}
 
-面白さ: (値) (理由)
-驚き: (値) (理由)
-悲しみ: (値) (理由)
-怒り: (値) (理由)"""
+Q1. 面白さ(数値): 
+Q1. 面白さ(理由): 
+Q2. 驚き(数値): 
+Q2. 驚き(理由): 
+Q3. 悲しみ(数値): 
+Q3. 悲しみ(理由): 
+Q4. 怒り(数値): 
+Q4. 怒り(理由): 
+"""
 
     def extract_value(self, text: str, question: str) -> str:
         """Extract the value from the response text.
@@ -52,10 +64,10 @@ class ExperimentRunner:
             str: The extracted value
         """
         patterns = [
-            rf"{question}:\s*\(値\)\s*(\d+)",  # (値) パターン
-            rf"{question}:\s*(\d+)\s*\(",      # 数字が先のパターン
-            rf"{question}:\s*\((\d+)\)",       # 括弧付き数字のパターン
-            rf"{question}:\s*(\d+)",           # 単純な数字のパターン
+            rf"Q\d+\.\s*{question}\(数値\):\s*(\d+)",  # Q1. 面白さ(数値): 80
+            rf"Q\d+\.\s*{question}:\s*\(数値\):\s*(\d+)",  # Q1. 面白さ: (数値): 80
+            rf"Q\d+\.\s*{question}\s*数値:\s*(\d+)",  # Q1. 面白さ 数値: 80
+            rf"Q\d+\.\s*{question}:\s*(\d+)",  # Q1. 面白さ: 80 - フォールバックパターン
         ]
         
         for pattern in patterns:
@@ -75,8 +87,10 @@ class ExperimentRunner:
             str: The extracted reason
         """
         patterns = [
-            rf"{question}:.*?\(理由[:：]?\)\s*(.+?)(?=(?:\n[^\n]|$))",  # (理由) パターン
-            rf"{question}:.*?\(.*?\)\s*(.+?)(?=(?:\n[^\n]|$))",         # 一般的な括弧パターン
+            rf"Q\d+\.\s*{question}\(理由\):\s*(.+?)(?=(?:\n[QA]|$))",  # Q1. 面白さ(理由): [理由]
+            rf"Q\d+\.\s*{question}:\s*\(理由\):\s*(.+?)(?=(?:\n[QA]|$))",  # Q1. 面白さ: (理由): [理由]
+            rf"Q\d+\.\s*{question}\s*理由:\s*(.+?)(?=(?:\n[QA]|$))",  # Q1. 面白さ 理由: [理由]
+            rf"Q\d+\.\s*{question}理由:\s*(.+?)(?=(?:\n[QA]|$))",  # フォールバックパターン
         ]
         
         for pattern in patterns:
@@ -92,7 +106,7 @@ class ExperimentRunner:
             result: The response from the model
             params: Dictionary containing experiment parameters
         """
-        filename = f"{params['persona_key']}_{params['text_key']}_{params['model_key']}_n{params['trial']:02d}_temp{int(TEMPERATURE*100):02d}.txt"
+        filename = f"{params['persona_key']}_{params['model_key']}_n{params['trial']:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}.txt"
         filepath = os.path.join(RESULTS_DIR, filename)
         
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
