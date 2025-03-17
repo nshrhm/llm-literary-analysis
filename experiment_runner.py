@@ -1,26 +1,26 @@
-"""Main program for running the literature analysis experiment with Gemini."""
+"""Base class and implementations for running the literature analysis experiment."""
 
 import os
 import re
 import datetime
 import google.generativeai as genai
+import anthropic
 from parameters import *
 
 # Directory for storing experiment results
-RESULTS_DIR = "output"
+RESULTS_DIR = "results"
 
-class ExperimentRunner:
+class BaseExperimentRunner:
+    """Base class for experiment runners."""
+    
     def __init__(self):
-        """Initialize the experiment runner."""
-        self._setup_api()
-        os.makedirs(RESULTS_DIR, exist_ok=True)
+        """Initialize the base experiment runner."""
+        self.results_dir = os.path.join(RESULTS_DIR, self.get_model_type())
+        os.makedirs(self.results_dir, exist_ok=True)
 
-    def _setup_api(self):
-        """Set up the Gemini API."""
-        api_key = os.environ.get("GEMINI_API_KEY")
-        if not api_key:
-            raise ValueError("Missing GEMINI_API_KEY environment variable")
-        genai.configure(api_key=api_key)
+    def get_model_type(self) -> str:
+        """Get the model type (e.g., 'gemini' or 'claude')."""
+        raise NotImplementedError("Subclasses must implement get_model_type")
 
     def generate_prompt(self, persona: str, text_content: str) -> str:
         """Generate the prompt for the experiment.
@@ -106,8 +106,8 @@ Q4. 怒り(理由):
             result: The response from the model
             params: Dictionary containing experiment parameters
         """
-        filename = f"{params['persona_key']}_{params['model_key']}_n{params['trial']:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}.txt"
-        filepath = os.path.join(RESULTS_DIR, filename)
+        filename = f"{params['persona_key']}_{params['model_key']}_n{params['trial']:02d}_temp{int(TEMPERATURE*100):02d}_t{params['text_key']}.txt"
+        filepath = os.path.join(self.results_dir, filename)
         
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
@@ -140,8 +140,30 @@ Q4reason: {q4_reason}"""
             f.write(content)
 
     def run_experiment(self):
-        """Run the complete experiment across all combinations."""
-        for model_key, model_name in MODELS.items():
+        """Run the experiment."""
+        raise NotImplementedError("Subclasses must implement run_experiment")
+
+class GeminiExperimentRunner(BaseExperimentRunner):
+    """Experiment runner for Gemini models."""
+    
+    def get_model_type(self) -> str:
+        return "gemini"
+
+    def __init__(self):
+        """Initialize the Gemini experiment runner."""
+        super().__init__()
+        self._setup_api()
+
+    def _setup_api(self):
+        """Set up the Gemini API."""
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            raise ValueError("Missing GEMINI_API_KEY environment variable")
+        genai.configure(api_key=api_key)
+
+    def run_experiment(self):
+        """Run the experiment with Gemini models."""
+        for model_key, model_name in GEMINI_MODELS.items():
             model = genai.GenerativeModel(model_name)
             generation_config = genai.GenerationConfig(temperature=TEMPERATURE)
             
@@ -165,7 +187,61 @@ Q4reason: {q4_reason}"""
                             }
                             
                             self.save_result(response.text, params)
-                            print(f"Completed: {params['persona_key']}_{params['text_key']}_{params['model_key']}_n{trial:02d}")
+                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_t{params['text_key']}")
+                            
+                        except Exception as e:
+                            print(f"Error in trial {trial} with {model_name}: {str(e)}")
+                            continue
+
+class ClaudeExperimentRunner(BaseExperimentRunner):
+    """Experiment runner for Claude models."""
+    
+    def get_model_type(self) -> str:
+        return "claude"
+
+    def __init__(self):
+        """Initialize the Claude experiment runner."""
+        super().__init__()
+        self._setup_api()
+
+    def _setup_api(self):
+        """Set up the Claude API."""
+        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        if not api_key:
+            raise ValueError("Missing ANTHROPIC_API_KEY environment variable")
+        self.client = anthropic.Client(api_key=api_key)
+
+    def run_experiment(self):
+        """Run the experiment with Claude models."""
+        for model_key, model_name in CLAUDE_MODELS.items():
+            for persona_key, persona in PERSONAS.items():
+                for text_key, text_name in TEXTS.items():
+                    text_content = TEXT_CONTENT[text_key]
+                    prompt = self.generate_prompt(persona, text_content)
+                    
+                    for trial in range(1, TRIALS + 1):
+                        try:
+                            response = self.client.messages.create(
+                                model=model_name,
+                                max_tokens=1000,
+                                temperature=TEMPERATURE,
+                                messages=[
+                                    {"role": "user", "content": prompt}
+                                ]
+                            )
+                            
+                            params = {
+                                "persona_key": persona_key,
+                                "text_key": text_key,
+                                "model_key": model_key,
+                                "trial": trial,
+                                "persona": persona,
+                                "text_name": text_name,
+                                "model": model_name
+                            }
+                            
+                            self.save_result(response.content[0].text, params)
+                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_t{params['text_key']}")
                             
                         except Exception as e:
                             print(f"Error in trial {trial} with {model_name}: {str(e)}")
@@ -174,8 +250,14 @@ Q4reason: {q4_reason}"""
 def main():
     """Main entry point for the experiment."""
     try:
-        runner = ExperimentRunner()
-        runner.run_experiment()
+        # Run Gemini experiment
+        gemini_runner = GeminiExperimentRunner()
+        gemini_runner.run_experiment()
+        
+        # Run Claude experiment
+        claude_runner = ClaudeExperimentRunner()
+        claude_runner.run_experiment()
+        
         print("Experiment completed successfully!")
     except Exception as e:
         print(f"Error running experiment: {str(e)}")

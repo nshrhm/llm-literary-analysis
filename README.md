@@ -5,9 +5,16 @@ This research project evaluates the literary comprehension capabilities of vario
 ## Project Overview
 
 The project currently supports the following LLM models:
-- Google Gemini
-- Anthropic Claude
-- (Future planned support for OpenAI, GitHub Copilot, Deepseek, Grok)
+
+### Google Gemini
+- Gemini 2.0: Pro Exp, Flash Thinking Exp, Flash
+- Gemini 1.5: Pro, Flash
+- Gemma 3.0: 27B IT
+
+### Anthropic Claude
+- Claude 3.7: Sonnet
+- Claude 3.5: Sonnet, Haiku
+- Claude 3.0: Opus, Sonnet, Haiku
 
 ## Features
 
@@ -25,9 +32,9 @@ The project currently supports the following LLM models:
 ## Requirements
 
 - Python 3.12
-- google-generativeai (for Gemini models)
-- anthropic (for Claude models)
-- (Additional requirements will be added as more models are supported)
+- google-generativeai>=0.3.0 (for Gemini models)
+- anthropic>=0.43.0 (for Claude models)
+- python-dotenv>=1.0.0 (for environment variables)
 
 ## Setup
 
@@ -52,34 +59,34 @@ export ANTHROPIC_API_KEY="your_anthropic_api_key"
 
 ```
 llm-literary-analysis/
-├── gemini_*.py                    # Gemini model implementations
-├── claude_*.py                    # Claude model implementations
-├── parameters.py                  # Experiment parameters
+├── experiment_runner.py           # Unified experiment runner
+├── check_models.py               # Model availability checker
+├── parameters.py                 # Experiment parameters
 ├── aggregate_experiment_results.py # Result analysis tool
-├── output/                        # Current experiment results
-└── results/                       # Versioned experiment results
+└── results/                      # Experiment results
+    ├── gemini/                   # Gemini results
+    └── claude/                   # Claude results
 ```
 
 ## Usage
 
 ### Running Experiments
 
-1. Run experiments with Gemini models:
+1. Run experiments with all models:
 ```bash
-python gemini_main.py
+python experiment_runner.py
 ```
 
 2. Check model availability:
 ```bash
-python gemini_check_model.py
-python claude_check_model.py
+python check_models.py
 ```
 
 ### Processing Results
 
 1. Aggregate results into CSV format:
 ```bash
-python aggregate_experiment_results.py output/
+python aggregate_experiment_results.py results/
 ```
 
 The script will process all result files and generate a CSV file with:
@@ -87,15 +94,33 @@ The script will process all result files and generate a CSV file with:
 - Numerical evaluations (0-100 scores)
 - Reasoning for each evaluation
 
-### Result Format
+### Results
 
-Each evaluation includes:
+The experiment results are organized by LLM type:
 ```
-Q1. 面白さ(数値): [0-100]
-Q1. 面白さ(理由): [explanation]
-Q2. 驚き(数値): [0-100]
-Q2. 驚き(理由): [explanation]
-...
+results/
+├── gemini/
+│   └── p{persona}_{model}_n{trial}_temp{temp}_t{text}.txt
+└── claude/
+    └── p{persona}_{model}_n{trial}_temp{temp}_t{text}.txt
+```
+
+Each result file includes:
+```
+timestamp: [YYYY-MM-DD HH:MM:SS]
+persona: [Persona name]
+model: [Model name]
+trial: [Trial number]
+temperature: [Temperature value]
+text: [Text name]
+Q1value: [0-100]
+Q1reason: [Explanation for Interest/Fun]
+Q2value: [0-100]
+Q2reason: [Explanation for Surprise]
+Q3value: [0-100]
+Q3reason: [Explanation for Sadness]
+Q4value: [0-100]
+Q4reason: [Explanation for Anger]
 ```
 
 ## Contributing

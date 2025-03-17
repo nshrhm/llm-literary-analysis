@@ -2,12 +2,30 @@
 
 ## Key Implementation Paths
 
--   `gemini_main.py` is the main script for running the experiment with Gemini models.
--   `claude_check_model.py` and `gemini_check_model.py` are used to check the availability of the models.
--   `parameters.py` defines the personas, texts, models, and experiment parameters.
--   `aggregate_experiment_results.py` is used for aggregating and analyzing experiment results.
+-   `experiment_runner.py` contains the unified experiment runner for both Gemini and Claude models:
+    - `BaseExperimentRunner`: Common functionality for all LLM experiments
+    - `GeminiExperimentRunner`: Gemini-specific implementation
+    - `ClaudeExperimentRunner`: Claude-specific implementation
+-   `check_models.py` provides model availability checking for both LLMs
+-   `parameters.py` defines personas, texts, and model configurations
+-   `aggregate_experiment_results.py` is used for aggregating and analyzing experiment results
 
 ## Project-Specific Patterns
+
+### Model Organization
+-   Models are organized by LLM type in `parameters.py`:
+    ```python
+    GEMINI_MODELS = {
+        "gemini20pe": "gemini-2.0-pro-exp",
+        "gemini15f": "gemini-1.5-flash-8b-latest",
+        ...
+    }
+    CLAUDE_MODELS = {
+        "claude37s": "claude-3-7-sonnet-20250219",
+        "claude30h": "claude-3-haiku-20240307",
+        ...
+    }
+    ```
 
 ### Result Format
 -   The experiment results contain numerical evaluations (0-100) and reasons for four emotions:
@@ -23,15 +41,21 @@
 
 ## File Organization
 
--   The project uses a modular architecture with separate scripts for each LLM.
--   The prompts used for the LLMs are in Japanese.
--   The experiment results are saved in both versioned (`01_results_gemini/`) and current (`results_gemini/`) directories.
--   Results file naming follows the pattern: `p{persona_id}_t{text_id}_{model_name}_n{trial_number}_temp{temperature}.txt`
-    - persona_id: 1-4 (大学１年生、文学研究者、感情豊かな詩人、無感情なロボット)
-    - text_id: 1-3 (懐中時計、お金とピストル、ぼろぼろな駝鳥)
-    - model_name: gemini15f, gemini20pe, gemma30, etc.
-    - trial_number: 01, 02, etc.
-    - temperature: 50 (0.5), etc.
+-   The project uses a unified architecture with a base experiment runner.
+-   All prompts and text content are in Japanese.
+-   Results are organized by LLM type:
+    ```
+    results/
+    ├── gemini/          # Gemini experiment results
+    └── claude/          # Claude experiment results
+    ```
+-   Results file naming follows the pattern:
+    `p{persona}_{model}_n{trial}_temp{temp}_t{text}.txt`
+    - persona: p1-p4 (大学１年生、文学研究者、感情豊かな詩人、無感情なロボット)
+    - model: Model identifier (e.g., gemini15f, claude30h)
+    - trial: Trial number (e.g., n01)
+    - temp: Temperature value (e.g., temp50 for 0.5)
+    - text: t1-t3 (懐中時計、お金とピストル、ぼろぼろな駝鳥)
 
 ## Data Processing
 
@@ -55,6 +79,14 @@
 
 ## Tool Usage Patterns
 
--   `read_file` is used to read the contents of the existing files.
--   `write_to_file` is used to create and update the memory bank files and the `.clinerules` file.
--   Results are organized in versioned directories to maintain experiment history.
+-   BaseExperimentRunner provides common functionality:
+    - `generate_prompt`: Creates standardized prompts
+    - `extract_value/reason`: Processes model responses
+    - `save_result`: Handles result file creation
+-   Model-specific runners handle API interactions:
+    - GeminiExperimentRunner uses google.generativeai
+    - ClaudeExperimentRunner uses anthropic
+-   `check_models.py` provides unified model checking:
+    - Lists configured models
+    - Verifies model availability
+    - Shows model capabilities (Gemini)

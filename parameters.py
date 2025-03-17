@@ -16,7 +16,7 @@ TEXTS = {
 }
 
 # Model definitions
-MODELS = {
+GEMINI_MODELS = {
     "gemma30": "gemma-3-27b-it",
     "gemini20fte": "gemini-2.0-flash-thinking-exp",
     "gemini20pe": "gemini-2.0-pro-exp",
@@ -26,11 +26,27 @@ MODELS = {
     "gemini15p": "gemini-1.5-pro-latest"
 }
 
+# Claude model definitions
+CLAUDE_MODELS = {
+    "claude37s": "claude-3-7-sonnet-20250219",
+    "claude35s": "claude-3-5-sonnet-20241022",
+    "claude35h": "claude-3-5-haiku-20241022",
+    "claude30s": "claude-3-sonnet-20240229",
+    "claude30h": "claude-3-haiku-20240307",
+    "claude300": "claude-3-opus-20240229"
+}
+
+# Model type definitions
+MODEL_TYPES = {
+    "gemini": GEMINI_MODELS,
+    "claude": CLAUDE_MODELS
+}
+
 # Experiment parameters
 TRIALS = 1
 TEMPERATURE = 0.5
 
-# Text content (from experiment.md)
+# Text content definitions
 TEXT_CONTENT = {
     "t1": """懐中時計が箪笥の向う側へ落ちて一人でチクタクと動いておりました。
 鼠が見つけて笑いました。

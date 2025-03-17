@@ -18,13 +18,21 @@ flowchart TB
         parameters[parameters.py]
     end
 
-    subgraph LLM Interaction
-        claude[claude_*.py]
-        gemini[gemini_*.py]
-        parameters --> claude
-        parameters --> gemini
-        claude --> Claude[Claude API]
+    subgraph Experiment Runner
+        base[BaseExperimentRunner]
+        gemini[GeminiExperimentRunner]
+        claude[ClaudeExperimentRunner]
+        check[check_models.py]
+        
+        parameters --> base
+        base --> gemini
+        base --> claude
+        parameters --> check
+    end
+
+    subgraph APIs
         gemini --> Gemini[Gemini API]
+        claude --> Claude[Claude API]
     end
 
     subgraph Results
@@ -41,15 +49,20 @@ flowchart TB
 ### Results Structure
 ```
 project/
-├── results_gemini/       # Current experimental results
-│   └── p{persona}_t{text}_{model}_n{trial}_temp{temp}.txt
-├── 01_results_gemini/    # Versioned results
-│   └── p{persona}_t{text}_{model}_n{trial}_temp{temp}.txt
+├── results/
+│   ├── gemini/          # Gemini experiment results
+│   │   └── p{persona}_{model}_n{trial}_temp{temp}_t{text}.txt
+│   └── claude/          # Claude experiment results
+│       └── p{persona}_{model}_n{trial}_temp{temp}_t{text}.txt
 ```
 
 ### Naming Convention
-- `p{persona}`: Persona identifier (1-4)
-- `t{text}`: Text identifier (1-3)
-- `{model}`: Model identifier (e.g., gemini15f, gemma30)
-- `n{trial}`: Trial number (e.g., 01)
-- `temp{temp}`: Temperature setting (e.g., 50 for 0.5)
+- `p{persona}`: Persona identifier (1-4) e.g., p1, p2
+- `{model}`: Model identifier (e.g., gemini15f, claude30s)
+- `n{trial}`: Trial number (e.g., n01)
+- `temp{temp}`: Temperature setting (e.g., temp50 for 0.5)
+- `t{text}`: Text identifier (1-3) e.g., t1, t2
+
+### Model Naming Examples
+- Gemini: gemini15f (1.5 Flash), gemini20pe (2.0 Pro Exp)
+- Claude: claude37s (3.7 Sonnet), claude30h (3.0 Haiku)
