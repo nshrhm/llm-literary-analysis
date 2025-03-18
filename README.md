@@ -14,7 +14,9 @@ The project currently supports the following LLM models:
 ### Anthropic Claude
 - Claude 3.7: Sonnet
 - Claude 3.5: Sonnet, Haiku
-- Claude 3.0: Opus, Sonnet, Haiku
+- Claude 3.0: Sonnet, Haiku
+
+Note: Claude-3-Opus model (claude-3-opus-20240229) is temporarily disabled due to high API costs (as of 2025/03/18).
 
 ### X.AI Grok
 - Grok 2.0: Latest
@@ -64,7 +66,7 @@ pip install -r requirements.txt
 ```bash
 export GEMINI_API_KEY="your_gemini_api_key"
 export ANTHROPIC_API_KEY="your_anthropic_api_key"
-export XAI_API_KEY="your_xai_api_key"  # Get from console.x.ai
+export XAI_API_KEY="your_xai_api_key"
 export OPENAI_API_KEY="your_openai_api_key"
 ```
 

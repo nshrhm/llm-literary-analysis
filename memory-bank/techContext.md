@@ -10,6 +10,7 @@
 - Claude API
   - 環境変数: ANTHROPIC_API_KEY
   - モデル定義: CLAUDE_MODELS in parameters.py
+  - 注意: claude-3-opus-20240229は高コストのため一時的に無効化（2025/03/18）
 
 - Grok API
   - 環境変数: XAI_API_KEY

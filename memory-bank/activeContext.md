@@ -2,6 +2,11 @@
 
 ## 最新の更新（2025-03-18）
 
+### Claude-3-Opusモデルの一時的無効化
+- コスト削減のためclaude-3-opus-20240229を一時的に無効化
+- parameters.pyのCLAUDE_MODELSでコメントアウト処理
+- 将来的な費用対効果改善時に再検討予定
+
 ### Grok APIの改善
 - check_models.pyでのGrokモデルチェック機能を修正
   - 環境変数名を`GROK_API_KEY`から`XAI_API_KEY`に変更
