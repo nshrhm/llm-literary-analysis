@@ -7,6 +7,11 @@
   - Gemini: 60 requests/minute
   - Grok: 10 requests/minute
   - OpenAI: モデルタイプにより異なる（3-50 requests/minute）
+
+- Grok API特有の注意点:
+  - エンドポイントは "https://api.x.ai/v1" を使用
+  - 環境変数は "XAI_API_KEY" を使用
+  - モデル一覧の取得は GET /v1/models を使用
 - API使用量に応じた費用の発生:
   - プロバイダごとに異なる価格体系
   - 高性能モデルほど高コスト

@@ -1,9 +1,10 @@
-"""Script to check available models for both Gemini and Claude."""
+"""Script to check available models for Gemini, Claude, Grok, and OpenAI."""
 
 import os
 import google.generativeai as genai
 import anthropic
-from parameters import GEMINI_MODELS, CLAUDE_MODELS
+import requests
+from parameters import GEMINI_MODELS, CLAUDE_MODELS, GROK_MODELS, OPENAI_MODELS
 
 def check_gemini_models():
     """Check available Gemini models."""
@@ -56,11 +57,77 @@ def check_claude_models():
         
         print(f"{short_name} ({model_name}): {status}")
 
+def check_grok_models():
+    """Check available Grok models."""
+    print("\n=== Grok Models ===")
+    
+    # Configure the API key
+    api_key = os.environ.get("XAI_API_KEY")
+    if not api_key:
+        print("Error: XAI_API_KEY environment variable not set.")
+        return
+    
+    # List configured models
+    print("\nConfigured models:")
+    for short_name, model_name in GROK_MODELS.items():
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        try:
+            # Simple test request to check model availability
+            response = requests.get(
+                "https://api.x.ai/v1/models",
+                headers=headers
+            )
+            if response.status_code == 200:
+                status = "✓ Available"
+            else:
+                status = f"✗ Not Available (HTTP {response.status_code})"
+        except Exception as e:
+            status = f"✗ Not Available ({str(e)})"
+            
+        print(f"- {short_name}: {model_name} - {status}")
+
+def check_openai_models():
+    """Check available OpenAI models."""
+    print("\n=== OpenAI Models ===")
+    
+    # Configure the API key
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        print("Error: OPENAI_API_KEY environment variable not set.")
+        return
+    
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    
+    print("\nConfigured models:")
+    for short_name, model_info in OPENAI_MODELS.items():
+        try:
+            # Test model availability using the endpoint
+            response = requests.get(
+                model_info["endpoint"].replace("/completions", ""),
+                headers=headers
+            )
+            if response.status_code == 200:
+                status = "✓ Available"
+            else:
+                status = f"✗ Not Available (HTTP {response.status_code})"
+        except Exception as e:
+            status = f"✗ Not Available ({str(e)})"
+            
+        print(f"- {short_name} ({model_info['model_name']}) - Type: {model_info['type']} - {status}")
+
 def main():
     """Main function to check models."""
     try:
         check_gemini_models()
         check_claude_models()
+        check_grok_models()
+        check_openai_models()
     except Exception as e:
         print(f"Error checking models: {str(e)}")
 
