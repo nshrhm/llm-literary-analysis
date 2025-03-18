@@ -5,6 +5,7 @@ import re
 import datetime
 import google.generativeai as genai
 import anthropic
+from openai import OpenAI
 from parameters import *
 
 # Directory for storing experiment results
@@ -193,6 +194,62 @@ class GeminiExperimentRunner(BaseExperimentRunner):
                             print(f"Error in trial {trial} with {model_name}: {str(e)}")
                             continue
 
+class GrokExperimentRunner(BaseExperimentRunner):
+    """Experiment runner for Grok models."""
+    
+    def get_model_type(self) -> str:
+        return "grok"
+
+    def __init__(self):
+        """Initialize the Grok experiment runner."""
+        super().__init__()
+        self._setup_api()
+
+    def _setup_api(self):
+        """Set up the Grok API."""
+        api_key = os.environ.get("XAI_API_KEY")
+        if not api_key:
+            raise ValueError("Missing XAI_API_KEY environment variable")
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.x.ai/v1"
+        )
+
+    def run_experiment(self):
+        """Run the experiment with Grok models."""
+        for model_key, model_name in GROK_MODELS.items():
+            for persona_key, persona in PERSONAS.items():
+                for text_key, text_name in TEXTS.items():
+                    text_content = TEXT_CONTENT[text_key]
+                    prompt = self.generate_prompt(persona, text_content)
+                    
+                    for trial in range(1, TRIALS + 1):
+                        try:
+                            response = self.client.chat.completions.create(
+                                model=model_name,
+                                temperature=TEMPERATURE,
+                                messages=[
+                                    {"role": "user", "content": prompt}
+                                ]
+                            )
+                            
+                            params = {
+                                "persona_key": persona_key,
+                                "text_key": text_key,
+                                "model_key": model_key,
+                                "trial": trial,
+                                "persona": persona,
+                                "text_name": text_name,
+                                "model": model_name
+                            }
+                            
+                            self.save_result(response.choices[0].message.content, params)
+                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_t{params['text_key']}")
+                            
+                        except Exception as e:
+                            print(f"Error in trial {trial} with {model_name}: {str(e)}")
+                            continue
+
 class ClaudeExperimentRunner(BaseExperimentRunner):
     """Experiment runner for Claude models."""
     
@@ -250,6 +307,10 @@ class ClaudeExperimentRunner(BaseExperimentRunner):
 def main():
     """Main entry point for the experiment."""
     try:
+        # Run Grok experiment
+        grok_runner = GrokExperimentRunner()
+        grok_runner.run_experiment()
+
         # Run Gemini experiment
         gemini_runner = GeminiExperimentRunner()
         gemini_runner.run_experiment()

@@ -16,6 +16,10 @@ TEXTS = {
 }
 
 # Model definitions
+GROK_MODELS = {
+    "grok20l": "grok-2-latest",
+}
+
 GEMINI_MODELS = {
     "gemma30": "gemma-3-27b-it",
     "gemini20fte": "gemini-2.0-flash-thinking-exp",
@@ -38,6 +42,7 @@ CLAUDE_MODELS = {
 
 # Model type definitions
 MODEL_TYPES = {
+    "grok": GROK_MODELS,
     "gemini": GEMINI_MODELS,
     "claude": CLAUDE_MODELS
 }

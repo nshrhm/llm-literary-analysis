@@ -22,17 +22,20 @@ flowchart TB
         base[BaseExperimentRunner]
         gemini[GeminiExperimentRunner]
         claude[ClaudeExperimentRunner]
+        grok[GrokExperimentRunner]
         check[check_models.py]
         
         parameters --> base
         base --> gemini
         base --> claude
+        base --> grok
         parameters --> check
     end
 
     subgraph APIs
         gemini --> Gemini[Gemini API]
         claude --> Claude[Claude API]
+        grok --> Grok[X.AI Grok API]
     end
 
     subgraph Results
@@ -40,6 +43,7 @@ flowchart TB
         analysis[process_results.py]
         gemini --> results
         claude --> results
+        grok --> results
         results --> analysis
     end
 ```
@@ -66,3 +70,4 @@ project/
 ### Model Naming Examples
 - Gemini: gemini15f (1.5 Flash), gemini20pe (2.0 Pro Exp)
 - Claude: claude37s (3.7 Sonnet), claude30h (3.0 Haiku)
+- Grok: grok20l (2.0 Latest)

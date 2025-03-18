@@ -12,9 +12,12 @@
     - Gemini 2.0: gemini-2.0-pro-exp, gemini-2.0-flash-thinking-exp, etc.
     - Gemini 1.5: gemini-1.5-pro-latest, gemini-1.5-flash-8b-latest
     - Gemma: gemma-3-27b-it
+  - Grok:
+    - Grok 2.0: grok-2-latest
 - **Libraries:** 
   - `google-generativeai>=0.3.0` (Google Gemini API client)
   - `anthropic>=0.43.0` (Anthropic Claude API client)
+  - `openai>=1.0.0` (X.AI Grok API client)
   - `python-dotenv>=1.0.0` (Environment variable management)
 
 ## Development Setup
@@ -24,6 +27,7 @@
 - Required environment variables:
   - `GEMINI_API_KEY`: API key for accessing Gemini models
   - `ANTHROPIC_API_KEY`: API key for accessing Claude models
+  - `XAI_API_KEY`: API key for accessing Grok models (from console.x.ai)
 
 ## Technical Constraints
 

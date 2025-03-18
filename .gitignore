@@ -39,6 +39,10 @@ ENV/
 *.key
 results_*/
 !results_gemini/
+!results_grok/
+
+# Generated files
+aggregated_*.csv
 
 # Operating System
 .DS_Store

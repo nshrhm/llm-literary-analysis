@@ -16,6 +16,9 @@ The project currently supports the following LLM models:
 - Claude 3.5: Sonnet, Haiku
 - Claude 3.0: Opus, Sonnet, Haiku
 
+### X.AI Grok
+- Grok 2.0: Latest
+
 ## Features
 
 - Systematic evaluation of LLM's literary analysis capabilities
@@ -34,6 +37,7 @@ The project currently supports the following LLM models:
 - Python 3.12
 - google-generativeai>=0.3.0 (for Gemini models)
 - anthropic>=0.43.0 (for Claude models)
+- openai>=1.0.0 (for Grok models)
 - python-dotenv>=1.0.0 (for environment variables)
 
 ## Setup
@@ -53,6 +57,7 @@ pip install -r requirements.txt
 ```bash
 export GEMINI_API_KEY="your_gemini_api_key"
 export ANTHROPIC_API_KEY="your_anthropic_api_key"
+export XAI_API_KEY="your_xai_api_key"  # Get from console.x.ai
 ```
 
 ## Project Structure
@@ -65,19 +70,27 @@ llm-literary-analysis/
 ├── aggregate_experiment_results.py # Result analysis tool
 └── results/                      # Experiment results
     ├── gemini/                   # Gemini results
-    └── claude/                   # Claude results
+    ├── claude/                   # Claude results
+    └── grok/                     # Grok results
 ```
 
 ## Usage
 
 ### Running Experiments
 
-1. Run experiments with all models:
+1. Run experiments with specific model:
+```bash
+python grok_example.py    # Run Grok experiments
+python gemini_example.py  # Run Gemini experiments
+python claude_example.py  # Run Claude experiments
+```
+
+2. Run experiments with all models:
 ```bash
 python experiment_runner.py
 ```
 
-2. Check model availability:
+3. Check model availability:
 ```bash
 python check_models.py
 ```

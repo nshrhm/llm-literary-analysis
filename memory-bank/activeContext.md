@@ -3,17 +3,17 @@
 ## Current Focus
 
 The project is currently focused on:
-- Integrating Claude models into the experiment framework
 - Running unified experiments through `experiment_runner.py`
-- Managing results in a structured directory system for both LLMs
+- Managing results in a structured directory system for all LLMs
 - Evaluating emotional analysis capabilities across different models, personas, and texts
+- Integrating and comparing results from Gemini, Claude, and Grok models
 
 ## Recent Changes
 
 - Refactored codebase to use a unified experiment runner:
   - Created `BaseExperimentRunner` with common functionality
-  - Implemented `GeminiExperimentRunner` and `ClaudeExperimentRunner`
-  - Updated model definitions in `parameters.py`
+  - Implemented `GeminiExperimentRunner`, `ClaudeExperimentRunner`, and `GrokExperimentRunner`
+  - Updated model definitions in `parameters.py` to include all LLMs
 - Reorganized result directory structure:
   - Unified format: `results/{llm}/p{persona}_{model}_n{trial}_temp{temp}_t{text}.txt`
   - Separate directories for Gemini and Claude results
@@ -22,8 +22,8 @@ The project is currently focused on:
 
 ## Next Steps
 
-- Run complete experiments with both Gemini and Claude models
+- Run complete experiments with all models (Gemini, Claude, and Grok)
 - Compare emotional analysis results across different LLMs
-- Analyze performance patterns between model versions
+- Analyze performance patterns between model versions and providers
 - Document insights from cross-model comparisons
-- Consider implementing additional analysis tools for result comparison
+- Implement additional analysis tools for three-way model comparison
