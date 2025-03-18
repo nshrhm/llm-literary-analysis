@@ -107,7 +107,7 @@ Q4. 怒り(理由):
             result: The response from the model
             params: Dictionary containing experiment parameters
         """
-        filename = f"{params['persona_key']}_{params['model_key']}_n{params['trial']:02d}_temp{int(TEMPERATURE*100):02d}_t{params['text_key']}.txt"
+        filename = f"{params['persona_key']}_{params['model_key']}_n{params['trial']:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}.txt"
         filepath = os.path.join(self.results_dir, filename)
         
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -188,7 +188,7 @@ class GeminiExperimentRunner(BaseExperimentRunner):
                             }
                             
                             self.save_result(response.text, params)
-                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_t{params['text_key']}")
+                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}")
                             
                         except Exception as e:
                             print(f"Error in trial {trial} with {model_name}: {str(e)}")
@@ -244,7 +244,7 @@ class GrokExperimentRunner(BaseExperimentRunner):
                             }
                             
                             self.save_result(response.choices[0].message.content, params)
-                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_t{params['text_key']}")
+                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}")
                             
                         except Exception as e:
                             print(f"Error in trial {trial} with {model_name}: {str(e)}")
@@ -298,7 +298,7 @@ class ClaudeExperimentRunner(BaseExperimentRunner):
                             }
                             
                             self.save_result(response.content[0].text, params)
-                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_t{params['text_key']}")
+                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}")
                             
                         except Exception as e:
                             print(f"Error in trial {trial} with {model_name}: {str(e)}")

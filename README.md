@@ -113,9 +113,9 @@ The experiment results are organized by LLM type:
 ```
 results/
 ├── gemini/
-│   └── p{persona}_{model}_n{trial}_temp{temp}_t{text}.txt
+│   └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
 └── claude/
-    └── p{persona}_{model}_n{trial}_temp{temp}_t{text}.txt
+    └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
 ```
 
 Each result file includes:
