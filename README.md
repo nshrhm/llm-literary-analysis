@@ -19,6 +19,13 @@ The project currently supports the following LLM models:
 ### X.AI Grok
 - Grok 2.0: Latest
 
+### OpenAI
+- Text Generation Models:
+  - GPT-4: o, o-mini
+- Reasoning Models:
+  - O3: mini
+  - O1: mini
+
 ## Features
 
 - Systematic evaluation of LLM's literary analysis capabilities
@@ -37,7 +44,7 @@ The project currently supports the following LLM models:
 - Python 3.12
 - google-generativeai>=0.3.0 (for Gemini models)
 - anthropic>=0.43.0 (for Claude models)
-- openai>=1.0.0 (for Grok models)
+- openai>=1.0.0 (for Grok and OpenAI models)
 - python-dotenv>=1.0.0 (for environment variables)
 
 ## Setup
@@ -58,6 +65,7 @@ pip install -r requirements.txt
 export GEMINI_API_KEY="your_gemini_api_key"
 export ANTHROPIC_API_KEY="your_anthropic_api_key"
 export XAI_API_KEY="your_xai_api_key"  # Get from console.x.ai
+export OPENAI_API_KEY="your_openai_api_key"
 ```
 
 ## Project Structure
@@ -71,7 +79,8 @@ llm-literary-analysis/
 └── results/                      # Experiment results
     ├── gemini/                   # Gemini results
     ├── claude/                   # Claude results
-    └── grok/                     # Grok results
+    ├── grok/                     # Grok results
+    └── openai/                   # OpenAI results
 ```
 
 ## Usage
@@ -83,6 +92,7 @@ llm-literary-analysis/
 python grok_example.py    # Run Grok experiments
 python gemini_example.py  # Run Gemini experiments
 python claude_example.py  # Run Claude experiments
+python openai_example.py  # Run OpenAI experiments
 ```
 
 2. Run experiments with all models:
@@ -114,8 +124,14 @@ The experiment results are organized by LLM type:
 results/
 ├── gemini/
 │   └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
-└── claude/
-    └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
+├── claude/
+│   └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
+├── grok/
+│   └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
+└── openai/
+    └── p{persona}_{model}_n{trial}[_temp{temp}]_{text}.txt
+
+Note: For OpenAI reasoning models (o3-mini, o1-mini), the temperature parameter is omitted from the filename as these models do not use temperature settings.
 ```
 
 Each result file includes:
