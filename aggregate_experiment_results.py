@@ -1,4 +1,4 @@
-ｐｙｐｙimport os
+import os
 import csv
 import re
 import argparse
