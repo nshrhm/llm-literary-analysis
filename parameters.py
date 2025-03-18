@@ -47,6 +47,30 @@ MODEL_TYPES = {
     "claude": CLAUDE_MODELS
 }
 
+# OpenAI model definitions
+OPENAI_MODELS = {
+    "gpt-4o": {
+         "model_name": "gpt-4o",
+         "type": "text_generation",
+         "endpoint": "https://api.openai.com/v1/engines/gpt-4o/completions"
+    },
+    "gpt-4o-mini": {
+         "model_name": "gpt-4o-mini",
+         "type": "text_generation",
+         "endpoint": "https://api.openai.com/v1/engines/gpt-4o-mini/completions"
+    },
+    "o3-mini": {
+         "model_name": "o3-mini",
+         "type": "reasoning",
+         "endpoint": "https://api.openai.com/v1/engines/o3-mini/completions"
+    },
+    "o1-mini": {
+         "model_name": "o1-mini",
+         "type": "reasoning",
+         "endpoint": "https://api.openai.com/v1/engines/o1-mini/completions"
+    }
+}
+
 # Experiment parameters
 TRIALS = 1
 TEMPERATURE = 0.5

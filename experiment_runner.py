@@ -106,10 +106,15 @@ Q4. 怒り(理由):
         Args:
             result: The response from the model
             params: Dictionary containing experiment parameters
+                   use_temperature: Boolean indicating if temperature should be included
         """
-        filename = f"{params['persona_key']}_{params['model_key']}_n{params['trial']:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}.txt"
-        filepath = os.path.join(self.results_dir, filename)
+        # Generate filename based on whether temperature should be included
+        if params.get('use_temperature', True):
+            filename = f"{params['persona_key']}_{params['model_key']}_n{params['trial']:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}.txt"
+        else:
+            filename = f"{params['persona_key']}_{params['model_key']}_n{params['trial']:02d}_{params['text_key']}.txt"
         
+        filepath = os.path.join(self.results_dir, filename)
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         # Extract values and reasons
@@ -122,20 +127,32 @@ Q4. 怒り(理由):
         q4_value = self.extract_value(result, "怒り")
         q4_reason = self.extract_reason(result, "怒り")
         
-        content = f"""timestamp: {timestamp}
-persona: {params['persona']}
-model: {params['model']}
-trial: {params['trial']}
-temperature: {TEMPERATURE}
-text: {params['text_name']}
-Q1value: {q1_value}
-Q1reason: {q1_reason}
-Q2value: {q2_value}
-Q2reason: {q2_reason}
-Q3value: {q3_value}
-Q3reason: {q3_reason}
-Q4value: {q4_value}
-Q4reason: {q4_reason}"""
+        # Build content list
+        content_parts = [
+            f"timestamp: {timestamp}",
+            f"persona: {params['persona']}",
+            f"model: {params['model']}",
+            f"trial: {params['trial']}"
+        ]
+        
+        # Add temperature only if it should be included
+        if params.get('use_temperature', True):
+            content_parts.append(f"temperature: {TEMPERATURE}")
+        
+        # Add remaining content
+        content_parts.extend([
+            f"text: {params['text_name']}",
+            f"Q1value: {q1_value}",
+            f"Q1reason: {q1_reason}",
+            f"Q2value: {q2_value}",
+            f"Q2reason: {q2_reason}",
+            f"Q3value: {q3_value}",
+            f"Q3reason: {q3_reason}",
+            f"Q4value: {q4_value}",
+            f"Q4reason: {q4_reason}"
+        ])
+        
+        content = "\n".join(content_parts)
         
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(content)
@@ -188,7 +205,11 @@ class GeminiExperimentRunner(BaseExperimentRunner):
                             }
                             
                             self.save_result(response.text, params)
-                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}")
+                            # Progress message based on whether temperature is used
+                            if params.get('use_temperature', True):
+                                print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}")
+                            else:
+                                print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_{params['text_key']}")
                             
                         except Exception as e:
                             print(f"Error in trial {trial} with {model_name}: {str(e)}")
@@ -322,6 +343,73 @@ def main():
         print("Experiment completed successfully!")
     except Exception as e:
         print(f"Error running experiment: {str(e)}")
+
+class OpenAIExperimentRunner(BaseExperimentRunner):
+    """Experiment runner for OpenAI models."""
+    
+    def get_model_type(self) -> str:
+        return "openai"
+
+    def __init__(self):
+        """Initialize the OpenAI experiment runner."""
+        super().__init__()
+        self._setup_api()
+
+    def _setup_api(self):
+        """Set up the OpenAI API."""
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            raise ValueError("Missing OPENAI_API_KEY environment variable")
+        self.client = OpenAI(api_key=api_key)
+
+    def run_experiment(self):
+        """Run the experiment with OpenAI models."""
+        for model_key, model_info in OPENAI_MODELS.items():
+            model_name = model_info["model_name"]
+            
+            for persona_key, persona in PERSONAS.items():
+                for text_key, text_name in TEXTS.items():
+                    text_content = TEXT_CONTENT[text_key]
+                    prompt = self.generate_prompt(persona, text_content)
+                    
+                    for trial in range(1, TRIALS + 1):
+                        try:
+                            # モデルタイプに応じてtemperatureパラメータを設定
+                            if model_info["type"] == "reasoning":
+                                # reasoning型モデルはtemperatureパラメータを使用しない
+                                response = self.client.chat.completions.create(
+                                    model=model_name,
+                                    messages=[
+                                        {"role": "user", "content": prompt}
+                                    ]
+                                )
+                            else:
+                                # text_generation型モデルはtemperatureパラメータを使用
+                                response = self.client.chat.completions.create(
+                                    model=model_name,
+                                    temperature=TEMPERATURE,
+                                    messages=[
+                                        {"role": "user", "content": prompt}
+                                    ]
+                                )
+                            
+                            params = {
+                                "persona_key": persona_key,
+                                "text_key": text_key,
+                                "model_key": model_key,
+                                "trial": trial,
+                                "persona": persona,
+                                "text_name": text_name,
+                                "model": model_name,
+                                "use_temperature": model_info["type"] == "text_generation"
+                            }
+                            
+                            self.save_result(response.choices[0].message.content, params)
+                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}")
+                            
+                        except Exception as e:
+                            print(f"Error in trial {trial} with {model_name}: {str(e)}")
+                            continue
 
 if __name__ == "__main__":
     main()
