@@ -343,6 +343,10 @@ def main():
         # Run DeepSeek experiment (中国AIの代表格)
         deepseek_runner = DeepSeekExperimentRunner()
         deepseek_runner.run_experiment()
+
+        # Run Llama experiment (MetaのAI)
+        llama_runner = LlamaExperimentRunner()
+        llama_runner.run_experiment()
         
         print("Experiment completed successfully!")
     except Exception as e:
@@ -465,6 +469,63 @@ class OpenAIExperimentRunner(BaseExperimentRunner):
                                 "text_name": text_name,
                                 "model": model_name,
                                 "use_temperature": model_info["type"] == "text_generation"
+                            }
+                            
+                            self.save_result(response.choices[0].message.content, params)
+                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}")
+                            
+                        except Exception as e:
+                            print(f"Error in trial {trial} with {model_name}: {str(e)}")
+                            continue
+
+class LlamaExperimentRunner(BaseExperimentRunner):
+    """Experiment runner for Llama models."""
+    
+    def get_model_type(self) -> str:
+        return "llama"
+
+    def __init__(self):
+        """Initialize the Llama experiment runner."""
+        super().__init__()
+        self._setup_api()
+
+    def _setup_api(self):
+        """Set up the Llama API via Kluster.ai."""
+        api_key = os.environ.get("KLUSTERAI_API_KEY")
+        if not api_key:
+            raise ValueError("Missing KLUSTERAI_API_KEY environment variable")
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.kluster.ai/v1"
+        )
+
+    def run_experiment(self):
+        """Run the experiment with Llama models."""
+        for model_key, model_name in LLAMA_MODELS.items():
+            for persona_key, persona in PERSONAS.items():
+                for text_key, text_name in TEXTS.items():
+                    text_content = TEXT_CONTENT[text_key]
+                    prompt = self.generate_prompt(persona, text_content)
+                    
+                    for trial in range(1, TRIALS + 1):
+                        try:
+                            response = self.client.chat.completions.create(
+                                model=model_name,
+                                max_tokens=1000,
+                                temperature=TEMPERATURE,
+                                messages=[
+                                    {"role": "user", "content": prompt}
+                                ]
+                            )
+                            
+                            params = {
+                                "persona_key": persona_key,
+                                "text_key": text_key,
+                                "model_key": model_key,
+                                "trial": trial,
+                                "persona": persona,
+                                "text_name": text_name,
+                                "model": model_name
                             }
                             
                             self.save_result(response.choices[0].message.content, params)

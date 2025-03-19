@@ -16,6 +16,12 @@ CLAUDE_MODELS = {
     "claude30h": "claude-3-haiku-20240307",
     ...
 }
+
+LLAMA_MODELS = {
+    "llama33-70Bit": "klusterai/Meta-Llama-3.3-70B-Instruct-Turbo",
+    "llama31-405Bit": "klusterai/Meta-Llama-3.1-405B-Instruct-Turbo",
+    "llama31-8Bit": "klusterai/Meta-Llama-3.1-8B-Instruct-Turbo"
+}
 ```
 
 ## 組織化の原則
@@ -23,4 +29,4 @@ CLAUDE_MODELS = {
 - モデルIDは短縮形を使用（例：gemini20pe）
 - フルネームは実際のAPIモデル名を反映
 - バージョンと機能を識別子に含める
-- 各モデルタイプ（Gemini/Claude）で一貫した命名規則を使用
+- 各モデルタイプ（Gemini/Claude/Llama）で一貫した命名規則を使用

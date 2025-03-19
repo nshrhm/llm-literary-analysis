@@ -48,12 +48,20 @@ DEEPSEEK_MODELS = {
     "deepseekv3": "deepseek-ai/DeepSeek-V3"
 }
 
+# Llama model definitions
+LLAMA_MODELS = {
+    "llama33-70Bit": "klusterai/Meta-Llama-3.3-70B-Instruct-Turbo",
+    "llama31-405Bit": "klusterai/Meta-Llama-3.1-405B-Instruct-Turbo",
+    "llama31-8Bit": "klusterai/Meta-Llama-3.1-8B-Instruct-Turbo"
+}
+
 # Model type definitions
 MODEL_TYPES = {
     "grok": GROK_MODELS,
     "gemini": GEMINI_MODELS,
     "claude": CLAUDE_MODELS,
-    "deepseek": DEEPSEEK_MODELS
+    "deepseek": DEEPSEEK_MODELS,
+    "llama": LLAMA_MODELS
 }
 
 # OpenAI model definitions

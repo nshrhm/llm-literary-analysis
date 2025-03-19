@@ -7,7 +7,9 @@
 ```
 results/
 ├── gemini/          # Gemini実験結果
-└── claude/          # Claude実験結果
+├── claude/          # Claude実験結果
+├── llama/           # Llama実験結果
+└── deepseek/        # DeepSeek実験結果
 
 src/
 ├── experiment_runner.py     # 統合実験ランナー

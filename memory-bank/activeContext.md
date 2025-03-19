@@ -2,6 +2,15 @@
 
 ## 最新の更新（2025-03-19）
 
+### MetaのLlamaモデルの実装
+- LLAMA_MODELSをparameters.pyに追加
+  - llama33-70Bit: Meta-Llama-3.3-70B-Instruct-Turbo
+  - llama31-405Bit: Meta-Llama-3.1-405B-Instruct-Turbo
+  - llama31-8Bit: Meta-Llama-3.1-8B-Instruct-Turbo
+- Kluster.aiを介したAPI連携を実装
+- LlamaExperimentRunnerクラスを追加
+- DeepSeekと同じKLUSTERAI_API_KEYを使用
+
 ### DeepSeek-V3モデルの追加
 - DeepSeek-V3モデルをDEEPSEEK_MODELSに追加
 - 既存のDeepSeek-R1と同じインターフェースで実装
