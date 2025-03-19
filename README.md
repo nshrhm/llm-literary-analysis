@@ -32,6 +32,10 @@ Note: Claude-3-Opus model (claude-3-opus-20240229) is temporarily disabled due t
 - DeepSeek-R1
 - DeepSeek-V3
 
+### kluster.ai Meta Llama
+- Llama 3.3: 70B Instruct Turbo
+- Llama 3.1: 405B Instruct Turbo, 8B Instruct Turbo
+
 ## Features
 
 - Systematic evaluation of LLM's literary analysis capabilities
@@ -44,6 +48,14 @@ Note: Claude-3-Opus model (claude-3-opus-20240229) is temporarily disabled due t
 - Quantitative scoring (0-100) with detailed reasoning
 - Automated result aggregation and analysis
 - Comparative analysis across different models and personas
+
+### Upcoming Features (Planned)
+- Batch API Integration
+  - Cost optimization through provider-specific batch processing
+  - Asynchronous bulk processing
+  - Extended processing windows
+  - Provider-optimized batch sizes
+  - JSONL format support
 
 ## Requirements
 
@@ -72,7 +84,7 @@ export GEMINI_API_KEY="your_gemini_api_key"
 export ANTHROPIC_API_KEY="your_anthropic_api_key"
 export XAI_API_KEY="your_xai_api_key"
 export OPENAI_API_KEY="your_openai_api_key"
-export KLUSTERAI_API_KEY="your_klusterai_api_key"
+export KLUSTERAI_API_KEY="your_klusterai_api_key"  # Required for DeepSeek and Llama models
 ```
 
 ## Project Structure
@@ -88,7 +100,8 @@ llm-literary-analysis/
     ├── claude/                   # Claude results
     ├── grok/                     # Grok results
     ├── openai/                   # OpenAI results
-    └── deepseek/                 # DeepSeek results
+    ├── deepseek/                 # DeepSeek results
+    └── llama/                    # Llama results
 ```
 
 ## Usage
@@ -102,6 +115,7 @@ python gemini_example.py    # Run Gemini experiments
 python claude_example.py    # Run Claude experiments
 python openai_example.py    # Run OpenAI experiments
 python deepseek_example.py  # Run DeepSeek experiments
+python llama_example.py     # Run Llama experiments
 ```
 
 2. Run experiments with all models:
