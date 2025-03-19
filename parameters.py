@@ -42,11 +42,17 @@ CLAUDE_MODELS = {
     # "claude30o": "claude-3-opus-20240229"
 }
 
+# DeepSeek model definitions
+DEEPSEEK_MODELS = {
+    "deepseekr1": "deepseek-ai/DeepSeek-R1"
+}
+
 # Model type definitions
 MODEL_TYPES = {
     "grok": GROK_MODELS,
     "gemini": GEMINI_MODELS,
-    "claude": CLAUDE_MODELS
+    "claude": CLAUDE_MODELS,
+    "deepseek": DEEPSEEK_MODELS
 }
 
 # OpenAI model definitions

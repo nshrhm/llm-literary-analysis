@@ -28,6 +28,9 @@ Note: Claude-3-Opus model (claude-3-opus-20240229) is temporarily disabled due t
   - O3: mini
   - O1: mini
 
+### kluster.ai DeepSeek
+- DeepSeek-R1
+
 ## Features
 
 - Systematic evaluation of LLM's literary analysis capabilities
@@ -68,6 +71,7 @@ export GEMINI_API_KEY="your_gemini_api_key"
 export ANTHROPIC_API_KEY="your_anthropic_api_key"
 export XAI_API_KEY="your_xai_api_key"
 export OPENAI_API_KEY="your_openai_api_key"
+export KLUSTERAI_API_KEY="your_klusterai_api_key"
 ```
 
 ## Project Structure
@@ -82,7 +86,8 @@ llm-literary-analysis/
     ├── gemini/                   # Gemini results
     ├── claude/                   # Claude results
     ├── grok/                     # Grok results
-    └── openai/                   # OpenAI results
+    ├── openai/                   # OpenAI results
+    └── deepseek/                 # DeepSeek results
 ```
 
 ## Usage
@@ -91,10 +96,11 @@ llm-literary-analysis/
 
 1. Run experiments with specific model:
 ```bash
-python grok_example.py    # Run Grok experiments
-python gemini_example.py  # Run Gemini experiments
-python claude_example.py  # Run Claude experiments
-python openai_example.py  # Run OpenAI experiments
+python grok_example.py      # Run Grok experiments
+python gemini_example.py    # Run Gemini experiments
+python claude_example.py    # Run Claude experiments
+python openai_example.py    # Run OpenAI experiments
+python deepseek_example.py  # Run DeepSeek experiments
 ```
 
 2. Run experiments with all models:
@@ -111,7 +117,8 @@ python check_models.py
 
 1. Aggregate results into CSV format:
 ```bash
-python aggregate_experiment_results.py results/
+python aggregate_experiment_results.py results/  # すべての結果を集計
+python aggregate_experiment_results.py results/deepseek  # DeepSeekの結果のみを集計
 ```
 
 The script will process all result files and generate a CSV file with:
