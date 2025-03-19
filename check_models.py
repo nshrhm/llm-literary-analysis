@@ -1,10 +1,14 @@
-"""Script to check available models for Gemini, Claude, Grok, and OpenAI."""
+"""Script to check available models for Gemini, Claude, Grok, DeepSeek, and OpenAI."""
 
 import os
 import google.generativeai as genai
 import anthropic
 import requests
-from parameters import GEMINI_MODELS, CLAUDE_MODELS, GROK_MODELS, OPENAI_MODELS
+from openai import OpenAI
+from parameters import (
+    GEMINI_MODELS, CLAUDE_MODELS, GROK_MODELS,
+    OPENAI_MODELS, DEEPSEEK_MODELS
+)
 
 def check_gemini_models():
     """Check available Gemini models."""
@@ -121,6 +125,38 @@ def check_openai_models():
             
         print(f"- {short_name} ({model_info['model_name']}) - Type: {model_info['type']} - {status}")
 
+def check_deepseek_models():
+    """Check available DeepSeek models."""
+    print("\n=== DeepSeek Models ===")
+    
+    # Configure the API key
+    api_key = os.environ.get("KLUSTERAI_API_KEY")
+    if not api_key:
+        print("Error: KLUSTERAI_API_KEY environment variable not set.")
+        return
+    
+    # Prepare OpenAI client for kluster.ai
+    client = OpenAI(
+        api_key=api_key,
+        base_url="https://api.kluster.ai/v1"
+    )
+    
+    # List configured models
+    print("\nConfigured models:")
+    for short_name, model_name in DEEPSEEK_MODELS.items():
+        try:
+            # Test model availability
+            response = client.chat.completions.create(
+                model=model_name,
+                messages=[{"role": "user", "content": "test"}],
+                max_tokens=10
+            )
+            status = "✓ Available"
+        except Exception as e:
+            status = f"✗ Not Available ({str(e)})"
+        
+        print(f"- {short_name}: {model_name} - {status}")
+
 def main():
     """Main function to check models."""
     try:
@@ -128,6 +164,7 @@ def main():
         check_claude_models()
         check_grok_models()
         check_openai_models()
+        check_deepseek_models()
     except Exception as e:
         print(f"Error checking models: {str(e)}")
 
