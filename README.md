@@ -30,6 +30,7 @@ Note: Claude-3-Opus model (claude-3-opus-20240229) is temporarily disabled due t
 
 ### kluster.ai DeepSeek
 - DeepSeek-R1
+- DeepSeek-V3
 
 ## Features
 

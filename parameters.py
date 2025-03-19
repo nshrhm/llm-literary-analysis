@@ -44,7 +44,8 @@ CLAUDE_MODELS = {
 
 # DeepSeek model definitions
 DEEPSEEK_MODELS = {
-    "deepseekr1": "deepseek-ai/DeepSeek-R1"
+    "deepseekr1": "deepseek-ai/DeepSeek-R1",
+    "deepseekv3": "deepseek-ai/DeepSeek-V3"
 }
 
 # Model type definitions
