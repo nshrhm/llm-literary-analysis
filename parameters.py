@@ -39,7 +39,7 @@ CLAUDE_MODELS = {
     "claude30h": "claude-3-haiku-20240307",
     # 2025/03/18: API利用コストが高額なため一時的に無効化
     # 将来的に費用対効果が改善した場合は再度有効化を検討
-    # "claude300": "claude-3-opus-20240229"
+    # "claude30o": "claude-3-opus-20240229"
 }
 
 # Model type definitions
