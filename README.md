@@ -49,13 +49,20 @@ Note: Claude-3-Opus model (claude-3-opus-20240229) is temporarily disabled due t
 - Automated result aggregation and analysis
 - Comparative analysis across different models and personas
 
-### Upcoming Features (Planned)
-- Batch API Integration
-  - Cost optimization through provider-specific batch processing
-  - Asynchronous bulk processing
-  - Extended processing windows
-  - Provider-optimized batch sizes
-  - JSONL format support
+### Batch Processing (In Progress)
+- Batch API Integration for cost reduction:
+  - OpenAI: JSONL processing with 50% discount (In progress)
+  - Claude: Message Batches API (Planned)
+  - Gemini: Vertex AI Batch Prediction (Planned)
+  - Groq: Batch API (Planned)
+  - kluster.ai: Adaptive Batch Processing (Planned)
+
+Features:
+- 24-hour processing windows
+- Provider-optimized batch sizes
+- JSONL format support
+- Automatic error handling and retries
+- Result aggregation and validation
 
 ## Requirements
 
@@ -108,7 +115,7 @@ llm-literary-analysis/
 
 ### Running Experiments
 
-1. Run experiments with specific model:
+1. Run experiments with individual models:
 ```bash
 python grok_example.py      # Run Grok experiments
 python gemini_example.py    # Run Gemini experiments
@@ -118,7 +125,13 @@ python deepseek_example.py  # Run DeepSeek experiments
 python llama_example.py     # Run Llama experiments
 ```
 
-2. Run experiments with all models:
+2. Run OpenAI experiments with batch processing (50% cost reduction):
+```bash
+python openai_example.py --batch       # Run with batch processing
+python openai_example.py --cancel <batch_id>  # Cancel ongoing batch job
+```
+
+3. Run experiments with all models:
 ```bash
 python experiment_runner.py
 ```

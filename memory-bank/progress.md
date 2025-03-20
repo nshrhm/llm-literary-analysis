@@ -5,16 +5,28 @@
   - Geminiモデル可用性チェック（✓）
   - Claudeモデル可用性チェック（✓）
   - Grokモデル可用性チェック（✓）
-    - 環境変数名の修正（GROK_API_KEY → XAI_API_KEY）
-    - APIエンドポイントの修正（api.grok.x → api.x.ai）
   - OpenAIモデル可用性チェック（✓）
+  - DeepSeekモデル可用性チェック（✓）
+  - Llamaモデル可用性チェック（✓）
 
 ## 今後の課題
 - モデルチェック結果のログ機能
 - エラーハンドリングの強化
 - 定期的なモデル可用性チェックの自動化
+- 各プロバイダーのBatch API対応の完了
 
 ## 実装状況
+
+### OpenAI Batch API
+- 基本実装完了（2025-03-20）
+  - JSONLファイル生成機能
+  - バッチジョブ作成と監視
+  - 結果処理の実装
+  - エラーハンドリング
+- 既知の問題
+  - JSONフォーマットの改善が必要
+  - レスポンス解析の修正が必要
+
 ### Llamaモデル
 - Meta Llamaモデルの実装完了（2025-03-19）
   - 3つのモデルを追加（70B, 405B, 8B）
@@ -44,14 +56,15 @@
   - 最終的な回答は日本語で出力
   - aggregate_experiment_results.pyで適切に処理可能
 
-## 次期開発計画（2025-03-19）
-### BatchAPI対応
+## 次期開発計画（2025-03-20）
+### BatchAPI対応拡張
 - 各LLMプロバイダーのBatch APIを活用したコスト削減
-  - OpenAI: `/v1/chat/completions` batchエンドポイント
+  - OpenAI: JSONL処理の改善（進行中）
   - Claude: Message Batches API（50%コスト削減）
   - Gemini: Vertex AI Batch Prediction（50%コスト削減）
   - Groq: Batch API（25%コスト削減）
   - kluster.ai: 適応的推論Batch API
+
 - 実装予定の機能：
   - 各プロバイダーの制限に合わせたバッチサイズ設定
   - 最適な処理時間枠の設定
