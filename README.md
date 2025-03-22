@@ -142,7 +142,7 @@ python openai_example.py --cancel <batch_id>        # Cancel ongoing batch job
 python experiment_runner.py
 ```
 
-3. Check model availability:
+4. Check model availability:
 ```bash
 python check_models.py
 ```
@@ -202,3 +202,16 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Development Documentation
+
+### API Reference
+- OpenAI
+  - [Batch Processing](docs/api/openai/batch.md)
+  - [Files API](docs/api/openai/files.md)
+  - [Uploads API](docs/api/openai/uploads.md)
+- Claude
+  - [Batch Processing](docs/api/claude/batch.md)
+
+### Developer Notes
+- [Batch Processing Reference](docs/reference/batch-memo.md)
