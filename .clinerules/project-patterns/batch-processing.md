@@ -1,11 +1,73 @@
 # Batch Processing Patterns
 
 ## Provider-Specific Implementations
-### OpenAI
-- Endpoint: `/v1/chat/completions`
-- Format: JSONL batch requests
-- Batch Size: Provider recommended limits
-- Processing: Asynchronous with status tracking
+
+### OpenAI (実装済み: 2025-03-22)
+- エンドポイント: `/v1/chat/completions`
+- 形式: JSONLバッチリクエスト
+- コスト削減: 50%
+- 処理時間: 24時間以内
+- 制限:
+  - 最大50,000リクエスト/バッチ
+  - ファイルサイズ上限: 200MB
+
+#### 実装パターン
+```mermaid
+graph TD
+    A[JSONLファイル生成] --> B[ファイルアップロード]
+    B --> C[バッチジョブ作成]
+    C --> D[ステータス監視]
+    D --> E{完了判定}
+    E -->|完了| F[結果取得]
+    E -->|未完了| D
+    F --> G[結果保存]
+```
+
+#### ファイルフォーマット
+1. リクエストファイル（JSONL）:
+```json
+{
+  "custom_id": "p{persona}_{text}_n{trial}",
+  "method": "POST",
+  "url": "/v1/chat/completions",
+  "body": {
+    "model": "モデル名",
+    "temperature": 温度値,
+    "messages": [
+      {"role": "system", "content": "システムメッセージ"},
+      {"role": "user", "content": "ユーザーメッセージ"}
+    ]
+  }
+}
+```
+
+2. 結果ファイル（JSON）:
+```json
+{
+  "id": "バッチリクエストID",
+  "custom_id": "リクエスト識別子",
+  "response": {
+    "status_code": HTTPステータスコード,
+    "request_id": "OpenAIリクエストID",
+    "body": {
+      "choices": [
+        {
+          "message": {
+            "content": "レスポンス内容",
+            "role": "assistant"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+#### エラーハンドリング
+- バッチ作成エラー: ファイル形式、サイズ制限
+- 処理タイムアウト: 24時間制限
+- モデル制限: トークン数、レート制限
+- ネットワークエラー: 再試行とバックオフ
 
 ### Claude (Anthropic)
 - Feature: Message Batches API

@@ -49,9 +49,13 @@ Note: Claude-3-Opus model (claude-3-opus-20240229) is temporarily disabled due t
 - Automated result aggregation and analysis
 - Comparative analysis across different models and personas
 
-### Batch Processing (In Progress)
+### Batch Processing
 - Batch API Integration for cost reduction:
-  - OpenAI: JSONL processing with 50% discount (In progress)
+  - OpenAI: JSONL processing with 50% discount (Implemented)
+    - バッチジョブの作成と監視
+    - JSONLフォーマットでの入出力
+    - 結果の自動保存と整形
+    - エラーハンドリングとリトライ
   - Claude: Message Batches API (Planned)
   - Gemini: Vertex AI Batch Prediction (Planned)
   - Groq: Batch API (Planned)
@@ -63,6 +67,7 @@ Features:
 - JSONL format support
 - Automatic error handling and retries
 - Result aggregation and validation
+- Progress monitoring and status tracking
 
 ## Requirements
 
@@ -127,8 +132,9 @@ python llama_example.py     # Run Llama experiments
 
 2. Run OpenAI experiments with batch processing (50% cost reduction):
 ```bash
-python openai_example.py --batch       # Run with batch processing
-python openai_example.py --cancel <batch_id>  # Cancel ongoing batch job
+python openai_example.py --batch                    # Run with batch processing
+python openai_example.py --status <batch_id>        # Check batch job status
+python openai_example.py --cancel <batch_id>        # Cancel ongoing batch job
 ```
 
 3. Run experiments with all models:

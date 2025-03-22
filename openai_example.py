@@ -2,6 +2,7 @@
 
 import os
 import argparse
+from datetime import datetime
 from experiment_runner import OpenAIExperimentRunner
 from openai_batch_runner import OpenAIBatchRunner
 from parameters import OPENAI_MODELS
@@ -11,6 +12,7 @@ def main():
     parser = argparse.ArgumentParser(description="Run OpenAI experiments")
     parser.add_argument("--batch", action="store_true", help="Use batch processing (50% cost reduction)")
     parser.add_argument("--cancel", help="Cancel a batch job with the specified batch ID")
+    parser.add_argument("--status", help="Check status of a batch job with the specified batch ID")
     args = parser.parse_args()
 
     try:
@@ -19,12 +21,35 @@ def main():
             print("Error: OPENAI_API_KEY environment variable is not set")
             return
 
-        # バッチジョブのキャンセル
+        # Check batch status
+        if args.status:
+            try:
+                runner = OpenAIBatchRunner()
+                status = runner.client.batches.retrieve(args.status)
+                print(f"\nBatch {args.status} status:")
+                print(f"- Status: {status.status}")
+                print(f"- Total requests: {status.request_counts.total}")
+                print(f"- Completed: {status.request_counts.completed}")
+                print(f"- Failed: {status.request_counts.failed}")
+                
+                # If completed, save results
+                if status.status == "completed":
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    runner._save_results(status, timestamp)
+                elif status.errors:
+                    print("\nBatch errors:")
+                    for error in status.errors.data:
+                        print(f"- {error.message}")
+                return
+            except Exception as e:
+                print(f"Error checking batch status: {str(e)}")
+                return
+
+        # Cancel batch job
         if args.cancel:
             try:
-                from openai import OpenAI
-                client = OpenAI()
-                client.batches.cancel(args.cancel)
+                runner = OpenAIBatchRunner()
+                runner.client.batches.cancel(args.cancel)
                 print(f"Successfully cancelled batch job: {args.cancel}")
                 return
             except Exception as e:
