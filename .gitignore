@@ -53,3 +53,4 @@ aggregated_*.csv
 .Trashes
 ehthumbs.db
 Thumbs.db
+# Documentation\ndocs/
