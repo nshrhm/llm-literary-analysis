@@ -1,1 +1,0 @@
-{"custom_id": "test_request", "method": "POST", "url": "/v1/chat/completions", "body": {"model": {"model_name": "gpt-4o", "type": "text_generation", "endpoint": "https://api.openai.com/v1/engines/gpt-4o/completions"}, "messages": [{"role": "user", "content": "テストメッセージです。"}]}}

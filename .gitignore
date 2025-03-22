@@ -37,9 +37,10 @@ ENV/
 # Project specific
 *_api_key.txt
 *.key
-results_*/
-!results_gemini/
-!results_grok/
+
+# Results directory
+results/
+!results/.gitkeep
 
 # Generated files
 aggregated_*.csv
