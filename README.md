@@ -58,7 +58,11 @@ Note: Claude-3-Opus model (claude-3-opus-20240229) is temporarily disabled due t
     - Support for all OpenAI models:
       - Standard models (gpt-4o, gpt-4o-mini)
       - Limited models (o3-mini: no temperature, o1-mini: no system role)
-  - Claude: Message Batches API (Planned)
+  - Claude: Message Batches API (Implemented)
+    - バッチリクエストの生成と管理
+    - 最大100,000リクエスト対応
+    - 29日間の結果保持
+    - エラーハンドリングとリカバリ
   - Gemini: Vertex AI Batch Prediction (Planned)
   - Groq: Batch API (Planned)
   - kluster.ai: Adaptive Batch Processing (Planned)
