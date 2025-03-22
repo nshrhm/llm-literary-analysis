@@ -51,23 +51,42 @@ Note: Claude-3-Opus model (claude-3-opus-20240229) is temporarily disabled due t
 
 ### Batch Processing
 - Batch API Integration for cost reduction:
-  - OpenAI: JSONL processing with 50% discount (Implemented)
-    - バッチジョブの作成と監視
-    - JSONLフォーマットでの入出力
-    - 結果の自動保存と整形
-    - エラーハンドリングとリトライ
+  - OpenAI (Ver.1 - Implemented):
+    - JSONL processing with 50% cost reduction
+    - Model-specific request formatting
+    - Automatic error recovery
+    - Support for all OpenAI models:
+      - Standard models (gpt-4o, gpt-4o-mini)
+      - Limited models (o3-mini: no temperature, o1-mini: no system role)
   - Claude: Message Batches API (Planned)
   - Gemini: Vertex AI Batch Prediction (Planned)
   - Groq: Batch API (Planned)
   - kluster.ai: Adaptive Batch Processing (Planned)
 
 Features:
-- 24-hour processing windows
-- Provider-optimized batch sizes
-- JSONL format support
-- Automatic error handling and retries
-- Result aggregation and validation
-- Progress monitoring and status tracking
+- Request Processing:
+  - Model-specific request formatting
+  - JSONL format for batch requests
+  - Automatic parameter validation
+  - Error prevention and recovery
+
+- Execution Control:
+  - 24-hour processing windows
+  - Provider-optimized batch sizes
+  - Status monitoring with backoff
+  - Partial success handling
+
+- Result Management:
+  - JSONL format for batch results
+  - Standard TXT format for individual results
+  - Consistent metadata format
+  - Error logging and tracking
+
+- Error Handling:
+  - Model-specific adaptations
+  - Automatic retries with backoff
+  - Partial result recovery
+  - Detailed error logging
 
 ## Requirements
 
