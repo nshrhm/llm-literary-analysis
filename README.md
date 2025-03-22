@@ -203,15 +203,15 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Development Documentation
+## For Developers
 
-### API Reference
-- OpenAI
-  - [Batch Processing](docs/api/openai/batch.md)
-  - [Files API](docs/api/openai/files.md)
-  - [Uploads API](docs/api/openai/uploads.md)
-- Claude
-  - [Batch Processing](docs/api/claude/batch.md)
+Development documentation is maintained locally in the `docs/` directory and is not included in the public repository for security and maintenance reasons. After cloning the repository, you can find API references and developer notes in:
 
-### Developer Notes
-- [Batch Processing Reference](docs/reference/batch-memo.md)
+- API Documentation: `docs/api/`
+  - OpenAI API implementation details (batch processing, files, uploads)
+  - Claude API integration guides (batch processing)
+- Developer Notes: `docs/reference/`
+  - Batch processing implementation guides
+  - Best practices and known issues
+
+Note: These documents are automatically excluded from Git to maintain separate development and production environments.
