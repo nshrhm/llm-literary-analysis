@@ -7,6 +7,7 @@ import google.generativeai as genai
 import anthropic
 from openai import OpenAI
 from parameters import *
+from prompt_manager import PromptManager
 
 # Directory for storing experiment results
 RESULTS_DIR = "results"
@@ -23,36 +24,6 @@ class BaseExperimentRunner:
         """Get the model type (e.g., 'gemini' or 'claude')."""
         raise NotImplementedError("Subclasses must implement get_model_type")
 
-    def generate_prompt(self, persona: str, text_content: str) -> str:
-        """Generate the prompt for the experiment.
-        
-        Args:
-            persona: The persona to use for the analysis
-            text_content: The text content to analyze
-        
-        Returns:
-            str: The generated prompt
-        """
-        return f"""あなたは {persona} です。以下の文章を読み、それぞれの感情について、以下の定義と基準に従って0から100の間の整数で評価してください。0はその感情が全くない状態、100はその感情が最も強い状態を表します。そして、その感情の強さの理由を記述してください。
-
-* 感情の定義: 
-
-面白さ: 読んでいて楽しい、愉快だと感じる度合い（基準：物語のユーモラスな表現、意外性のある展開など）
-驚き: 予想外の展開や情報に触れ、心が動揺する度合い（基準：物語の展開の斬新さ、予想を裏切る展開など）
-悲しみ: 登場人物の心情に共感し、心が痛む度合い（基準：登場人物の心情への共感度合い、物語の結末など）
-怒り: 不当な行為や状況に対して、憤りを感じる度合い（基準：登場人物の行動への共感度合い、社会的なテーマへの共感度合い）
-
-{text_content}
-
-Q1. 面白さ(数値): 
-Q1. 面白さ(理由): 
-Q2. 驚き(数値): 
-Q2. 驚き(理由): 
-Q3. 悲しみ(数値): 
-Q3. 悲しみ(理由): 
-Q4. 怒り(数値): 
-Q4. 怒り(理由): 
-"""
 
     def extract_value(self, text: str, question: str) -> str:
         """Extract the value from the response text.
@@ -188,11 +159,11 @@ class GeminiExperimentRunner(BaseExperimentRunner):
             for persona_key, persona in PERSONAS.items():
                 for text_key, text_name in TEXTS.items():
                     text_content = TEXT_CONTENT[text_key]
-                    prompt = self.generate_prompt(persona, text_content)
+                    prompt = PromptManager.get_prompt("gemini", persona_key, text_content, model_key)
                     
                     for trial in range(1, TRIALS + 1):
                         try:
-                            response = model.generate_content(prompt, generation_config=generation_config)
+                            response = model.generate_content(prompt["messages"][0]["content"], generation_config=generation_config)
                             
                             params = {
                                 "persona_key": persona_key,
@@ -242,16 +213,14 @@ class GrokExperimentRunner(BaseExperimentRunner):
             for persona_key, persona in PERSONAS.items():
                 for text_key, text_name in TEXTS.items():
                     text_content = TEXT_CONTENT[text_key]
-                    prompt = self.generate_prompt(persona, text_content)
+                    prompt = PromptManager.get_prompt("grok", persona_key, text_content, model_key)
                     
                     for trial in range(1, TRIALS + 1):
                         try:
                             response = self.client.chat.completions.create(
                                 model=model_name,
                                 temperature=TEMPERATURE,
-                                messages=[
-                                    {"role": "user", "content": prompt}
-                                ]
+                                messages=prompt["messages"]
                             )
                             
                             params = {
@@ -295,7 +264,7 @@ class ClaudeExperimentRunner(BaseExperimentRunner):
             for persona_key, persona in PERSONAS.items():
                 for text_key, text_name in TEXTS.items():
                     text_content = TEXT_CONTENT[text_key]
-                    prompt = self.generate_prompt(persona, text_content)
+                    prompt = PromptManager.get_prompt("claude", persona_key, text_content, model_key)
                     
                     for trial in range(1, TRIALS + 1):
                         try:
@@ -303,9 +272,7 @@ class ClaudeExperimentRunner(BaseExperimentRunner):
                                 model=model_name,
                                 max_tokens=1000,
                                 temperature=TEMPERATURE,
-                                messages=[
-                                    {"role": "user", "content": prompt}
-                                ]
+                                messages=prompt["messages"]
                             )
                             
                             params = {
@@ -380,7 +347,7 @@ class DeepSeekExperimentRunner(BaseExperimentRunner):
             for persona_key, persona in PERSONAS.items():
                 for text_key, text_name in TEXTS.items():
                     text_content = TEXT_CONTENT[text_key]
-                    prompt = self.generate_prompt(persona, text_content)
+                    prompt = PromptManager.get_prompt("deepseek", persona_key, text_content, model_key)
                     
                     for trial in range(1, TRIALS + 1):
                         try:
@@ -388,9 +355,7 @@ class DeepSeekExperimentRunner(BaseExperimentRunner):
                                 model=model_name,
                                 max_tokens=1000,
                                 temperature=TEMPERATURE,
-                                messages=[
-                                    {"role": "user", "content": prompt}
-                                ]
+                                messages=prompt["messages"]
                             )
                             
                             params = {
@@ -437,7 +402,7 @@ class OpenAIExperimentRunner(BaseExperimentRunner):
             for persona_key, persona in PERSONAS.items():
                 for text_key, text_name in TEXTS.items():
                     text_content = TEXT_CONTENT[text_key]
-                    prompt = self.generate_prompt(persona, text_content)
+                    prompt = PromptManager.get_prompt("openai", persona_key, text_content, model_key)
                     
                     for trial in range(1, TRIALS + 1):
                         try:
@@ -446,18 +411,14 @@ class OpenAIExperimentRunner(BaseExperimentRunner):
                                 # reasoning型モデルはtemperatureパラメータを使用しない
                                 response = self.client.chat.completions.create(
                                     model=model_name,
-                                    messages=[
-                                        {"role": "user", "content": prompt}
-                                    ]
+                                    messages=prompt["messages"]
                                 )
                             else:
                                 # text_generation型モデルはtemperatureパラメータを使用
                                 response = self.client.chat.completions.create(
                                     model=model_name,
                                     temperature=TEMPERATURE,
-                                    messages=[
-                                        {"role": "user", "content": prompt}
-                                    ]
+                                    messages=prompt["messages"]
                                 )
                             
                             params = {
@@ -505,7 +466,7 @@ class LlamaExperimentRunner(BaseExperimentRunner):
             for persona_key, persona in PERSONAS.items():
                 for text_key, text_name in TEXTS.items():
                     text_content = TEXT_CONTENT[text_key]
-                    prompt = self.generate_prompt(persona, text_content)
+                    prompt = PromptManager.get_prompt("llama", persona_key, text_content, model_key)
                     
                     for trial in range(1, TRIALS + 1):
                         try:
@@ -513,9 +474,7 @@ class LlamaExperimentRunner(BaseExperimentRunner):
                                 model=model_name,
                                 max_tokens=1000,
                                 temperature=TEMPERATURE,
-                                messages=[
-                                    {"role": "user", "content": prompt}
-                                ]
+                                messages=prompt["messages"]
                             )
                             
                             params = {

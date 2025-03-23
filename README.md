@@ -38,8 +38,23 @@ Note: Claude-3-Opus model (claude-3-opus-20240229) is temporarily disabled due t
 
 ## Features
 
+### Core Features
 - Systematic evaluation of LLM's literary analysis capabilities
 - Support for multiple LLM models
+- Unified prompt management across all models
+- Standardized result format and aggregation
+
+### Unified Prompt Management
+- Centralized prompt definition and configuration
+- Model-specific format adaptations
+- Support for various model requirements:
+  - Standard message format (OpenAI, Gemini, Grok)
+  - Content format (Claude)
+  - System role limitations (o1-mini)
+  - Temperature handling (o3-mini)
+- Easy extension for new models
+
+### Analysis Features
 - Emotional analysis across four dimensions:
   - Interest/Fun (面白さ)
   - Surprise (驚き)
@@ -185,6 +200,7 @@ The script will process all result files and generate a CSV file with:
 
 ### Results
 
+#### Result Organization
 The experiment results are organized by LLM type:
 ```
 results/
@@ -194,12 +210,17 @@ results/
 │   └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
 ├── grok/
 │   └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
-└── openai/
-    └── p{persona}_{model}_n{trial}[_temp{temp}]_{text}.txt
+├── openai/
+│   └── p{persona}_{model}_n{trial}[_temp{temp}]_{text}.txt
+├── deepseek/
+│   └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
+└── llama/
+    └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
 
 Note: For OpenAI reasoning models (o3-mini, o1-mini), the temperature parameter is omitted from the filename as these models do not use temperature settings.
 ```
 
+#### Result Files
 Each result file includes:
 ```
 timestamp: [YYYY-MM-DD HH:MM:SS]
@@ -218,9 +239,32 @@ Q4value: [0-100]
 Q4reason: [Explanation for Anger]
 ```
 
+#### Aggregated Results
+The `aggregate_experiment_results.py` script processes all result files and generates model-specific CSV files:
+
+```
+aggregated_results/
+├── aggregated_openai_[timestamp].csv     (48 results)
+├── aggregated_claude_[timestamp].csv     (60 results)
+├── aggregated_gemini_[timestamp].csv     (83 results)
+├── aggregated_grok_[timestamp].csv       (12 results)
+├── aggregated_deepseek_[timestamp].csv   (24 results)
+└── aggregated_llama_[timestamp].csv      (36 results)
+```
+
+Each CSV file contains:
+- Complete metadata (timestamp, model, persona, etc.)
+- Numerical scores for all emotional dimensions
+- Detailed reasoning for each score
+- Error tracking and validation results
+
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request. Areas of particular interest:
+- Support for new LLM models
+- Enhanced prompt management features
+- Result analysis improvements
+- Documentation translations
 
 ## License
 

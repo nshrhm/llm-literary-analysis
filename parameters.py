@@ -1,5 +1,77 @@
 """Configuration parameters for the experiment."""
 
+# Prompt definitions
+BASE_PROMPT = """以下のテキストを読んで、4つの感情（面白さ、驚き、悲しみ、怒り）について0-100の数値で評価し、
+その理由も説明してください。
+
+テキスト：
+{text_content}
+
+回答は以下の形式で記述してください：
+Q1. 面白さ(数値): [0-100]
+Q1. 面白さ(理由): [説明]
+
+Q2. 驚き(数値): [0-100]
+Q2. 驚き(理由): [説明]
+
+Q3. 悲しみ(数値): [0-100]
+Q3. 悲しみ(理由): [説明]
+
+Q4. 怒り(数値): [0-100]
+Q4. 怒り(理由): [説明]"""
+
+SYSTEM_PROMPTS = {
+    "p1": "あなたは大学１年生です。日本の文学テキストに対する感情分析を行います。",
+    "p2": "あなたは文学研究者です。日本の文学テキストに対する感情分析を行います。",
+    "p3": "あなたは感情豊かな詩人です。日本の文学テキストに対する感情分析を行います。",
+    "p4": "あなたは無感情なロボットです。日本の文学テキストに対する感情分析を行います。"
+}
+
+# Model-specific prompt configurations
+MODEL_CONFIGS = {
+    "openai": {
+        "standard": {
+            "max_tokens": 1024,
+            "format": "messages"
+        },
+        "o1-mini": {
+            "max_tokens": 1024,
+            "format": "combined"  # system+userを結合
+        }
+    },
+    "claude": {
+        "standard": {
+            "max_tokens": 1024,
+            "format": "content"
+        }
+    },
+    "gemini": {
+        "standard": {
+            "max_tokens": 1024,
+            "format": "messages"
+        }
+    },
+    "grok": {
+        "standard": {
+            "max_tokens": 1024,
+            "format": "messages"
+        }
+    },
+    "deepseek": {
+        "standard": {
+            "max_tokens": 1024,
+            "format": "messages"
+        }
+    },
+    "llama": {
+        "standard": {
+            "max_tokens": 1024,
+            "format": "messages"
+        }
+    }
+}
+
+
 # Persona definitions
 PERSONAS = {
     "p1": "大学１年生",
