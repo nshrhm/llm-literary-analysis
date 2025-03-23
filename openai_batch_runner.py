@@ -5,6 +5,7 @@ import json
 from datetime import datetime
 from openai import OpenAI
 from parameters import OPENAI_MODELS
+from prompt_manager import PromptManager
 
 class OpenAIBatchRunner:
     """Handles OpenAI batch processing experiments."""
@@ -147,116 +148,25 @@ class OpenAIBatchRunner:
             for persona_id, persona in PERSONAS.items():
                 for text_id, text_content in TEXT_CONTENT.items():
                     custom_id = f"{persona_id}_{model_id}_{text_id}_n01_temp{int(TEMPERATURE*100)}"
-                    # Prepare request based on model type
-                    if model_id in ['o3-mini']:
-                        # o3-mini: no temperature support
-                        request = {
-                            "custom_id": custom_id,
-                            "method": "POST",
-                            "url": "/v1/chat/completions",
-                            "body": {
-                                "model": model_config["model_name"],
-                                "messages": [
-                                    {
-                                        "role": "system",
-                                        "content": f"あなたは{persona}です。日本の文学テキストに対する感情分析を行います。"
-                                    },
-                                    {
-                                        "role": "user",
-                                        "content": f"""以下のテキストを読んで、4つの感情（面白さ、驚き、悲しみ、怒り）について0-100の数値で評価し、
-その理由も説明してください。
-
-テキスト：
-{text_content}
-
-回答は以下の形式で記述してください：
-Q1. 面白さ(数値): [0-100]
-Q1. 面白さ(理由): [説明]
-
-Q2. 驚き(数値): [0-100]
-Q2. 驚き(理由): [説明]
-
-Q3. 悲しみ(数値): [0-100]
-Q3. 悲しみ(理由): [説明]
-
-Q4. 怒り(数値): [0-100]
-Q4. 怒り(理由): [説明]"""
-                                    }
-                                ]
-                            }
-                        }
-                    elif model_id in ['o1-mini']:
-                        # o1-mini: no system role support
-                        request = {
-                            "custom_id": custom_id,
-                            "method": "POST",
-                            "url": "/v1/chat/completions",
-                            "body": {
-                                "model": model_config["model_name"],
-                                "messages": [
-                                    {
-                                        "role": "user",
-                                        "content": f"""あなたは{persona}です。日本の文学テキストに対する感情分析を行います。
-
-以下のテキストを読んで、4つの感情（面白さ、驚き、悲しみ、怒り）について0-100の数値で評価し、その理由も説明してください。
-
-テキスト：
-{text_content}
-
-回答は以下の形式で記述してください：
-Q1. 面白さ(数値): [0-100]
-Q1. 面白さ(理由): [説明]
-
-Q2. 驚き(数値): [0-100]
-Q2. 驚き(理由): [説明]
-
-Q3. 悲しみ(数値): [0-100]
-Q3. 悲しみ(理由): [説明]
-
-Q4. 怒り(数値): [0-100]
-Q4. 怒り(理由): [説明]"""
-                                    }
-                                ]
-                            }
-                        }
-                    else:
-                        # Default request format for other models
-                        request = {
-                            "custom_id": custom_id,
-                            "method": "POST",
-                            "url": "/v1/chat/completions",
-                            "body": {
-                                "model": model_config["model_name"],
-                                "temperature": TEMPERATURE,
-                                "messages": [
-                                    {
-                                        "role": "system",
-                                        "content": f"あなたは{persona}です。日本の文学テキストに対する感情分析を行います。"
-                                    },
-                                    {
-                                        "role": "user",
-                                        "content": f"""以下のテキストを読んで、4つの感情（面白さ、驚き、悲しみ、怒り）について0-100の数値で評価し、
-その理由も説明してください。
-
-テキスト：
-{text_content}
-
-回答は以下の形式で記述してください：
-Q1. 面白さ(数値): [0-100]
-Q1. 面白さ(理由): [説明]
-
-Q2. 驚き(数値): [0-100]
-Q2. 驚き(理由): [説明]
-
-Q3. 悲しみ(数値): [0-100]
-Q3. 悲しみ(理由): [説明]
-
-Q4. 怒り(数値): [0-100]
-Q4. 怒り(理由): [説明]"""
-                                }
-                            ]
+                    
+                    # PromptManagerを使用してプロンプトを生成
+                    prompt = PromptManager.get_prompt("openai", persona_id, text_content, model_id)
+                    
+                    # リクエストの作成
+                    request = {
+                        "custom_id": custom_id,
+                        "method": "POST",
+                        "url": "/v1/chat/completions",
+                        "body": {
+                            "model": model_config["model_name"],
+                            **prompt
                         }
                     }
+                    
+                    # temperature_supportがTrueのモデルのみtemperatureを追加
+                    if model_config.get("temperature_support", True):
+                        request["body"]["temperature"] = TEMPERATURE
+                    
                     json.dump(request, f, ensure_ascii=False)
                     f.write("\n")
         

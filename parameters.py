@@ -151,11 +151,13 @@ OPENAI_MODELS = {
     "o3-mini": {
          "model_name": "o3-mini",
          "type": "reasoning",
+         "temperature_support": False,
          "endpoint": "https://api.openai.com/v1/engines/o3-mini/completions"
     },
     "o1-mini": {
          "model_name": "o1-mini",
          "type": "reasoning",
+         "temperature_support": False,
          "endpoint": "https://api.openai.com/v1/engines/o1-mini/completions"
     }
 }
