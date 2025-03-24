@@ -206,14 +206,23 @@ class KlusterBatchRunner:
         results_dir = f"results/{model_type}/batch_results"
         os.makedirs(results_dir, exist_ok=True)
 
-        # Get results
+        # Get results and parse JSON
         result_file_id = batch_status.output_file_id
         results = self.client.files.content(result_file_id).content
-
-        # Save to file
+        
+        # Parse each line and re-encode with proper Japanese handling
+        processed_results = []
+        for line in results.decode().split('\n'):
+            if line:
+                # Parse JSON and re-encode with Japanese support
+                result = json.loads(line)
+                processed_results.append(json.dumps(result, ensure_ascii=False))
+        
+        # Save to file with proper encoding
         results_path = f"{results_dir}/batch_results_{timestamp}.jsonl"
-        with open(results_path, "wb") as f:
-            f.write(results)
+        with open(results_path, "w", encoding="utf-8") as f:
+            for result in processed_results:
+                f.write(result + "\n")
 
         return results_path
 
