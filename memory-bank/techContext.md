@@ -158,8 +158,15 @@
    - Better progress monitoring
    - Result validation enhancement
 
-10. Application to Other APIs
-    - Claude: Message batches
-    - Gemini: Vertex AI batch prediction
-    - Groq: Native batch API
-    - kluster.ai: Adaptive processing
+10. Batch Processing Implementation Status (2025-03-24)
+    - OpenAI: Completed and verified
+    - Claude: Completed and verified
+    - kluster.ai: 
+      - DeepSeek: Implementation in progress
+      - Llama: Scheduled for implementation
+    
+    Key features of kluster.ai batch processing:
+    - OpenAI-compatible API interface
+    - JSONLファイル形式でのバッチリクエスト
+    - 24時間の処理ウィンドウ
+    - ステータス監視とエラーハンドリング

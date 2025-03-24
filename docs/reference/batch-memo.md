@@ -2,14 +2,8 @@
 
 
 
-# Caude
+# Claude
 https://docs.anthropic.com/en/docs/build-with-claude/batch-processing
-
-# Gemini
-https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/batch-prediction-gemini
-
-# Grok
-https://console.groq.com/docs/batch
 
 # kluster.ai
 from openai import OpenAI
