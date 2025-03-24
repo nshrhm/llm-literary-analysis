@@ -22,7 +22,7 @@ class ClaudeBatchRunner:
         
     def _create_batch_requests(self, model_id, model_config, timestamp):
         """Create batch requests for Claude API."""
-        from parameters import TEXT_CONTENT, PERSONAS
+        from parameters import TEXT_CONTENT, PERSONAS, TEMPERATURE
         
         requests = []
         for persona_id, persona in PERSONAS.items():
@@ -58,6 +58,7 @@ Q4. 怒り(理由): [説明]"""
                     params=MessageCreateParamsNonStreaming(
                         model=model_config,  # CLAUDEモデルは直接モデル名を使用
                         max_tokens=1024,
+                        temperature=TEMPERATURE,
                         system=[{
                             "type": "text",
                             "text": f"あなたは{persona}です。日本の文学テキストに対する感情分析を行います。"
@@ -121,6 +122,9 @@ Q4. 怒り(理由): [説明]"""
                             message = result.result.message
                             content = message.content[0].text
                             
+                            # Import temperature parameter
+                            from parameters import TEMPERATURE
+                            
                             # Save in txt format
                             output_file = f"results/claude/{custom_id}.txt"
                             with open(output_file, "w", encoding="utf-8") as f:
@@ -129,6 +133,7 @@ Q4. 怒り(理由): [説明]"""
                                 f.write(f"persona: {persona_id}\n")
                                 f.write(f"model: {model_id}\n")
                                 f.write(f"trial: {trial}\n")
+                                f.write(f"temperature: {TEMPERATURE}\n")
                                 f.write(f"text: {text_id}\n")
                                 # Write content
                                 f.write(f"\n{content}\n")
@@ -138,12 +143,17 @@ Q4. 怒り(理由): [説明]"""
                         case "errored":
                             error_log = f"results/claude/batch_errors/error_{custom_id}_{timestamp}.jsonl"
                             with open(error_log, "w", encoding="utf-8") as f:
+                                # エラーオブジェクトから必要な情報を文字列として抽出
                                 error_data = {
-                                    "type": result.result.error.type,
-                                    "message": result.result.error.message
+                                    "error": str(result.result.error),
+                                    "error_type": str(type(result.result.error).__name__),
+                                    "error_details": {
+                                        k: str(v) for k, v in vars(result.result.error).items()
+                                        if not k.startswith('_')
+                                    }
                                 }
                                 json.dump(error_data, f, ensure_ascii=False)
-                            print(f"Error processing {custom_id}: {result.result.error.message}")
+                            print(f"Error processing {custom_id}: {str(result.result.error)}")
                             
                         case _:
                             print(f"Unexpected result type for {custom_id}: {result.result.type}")

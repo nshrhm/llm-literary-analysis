@@ -104,14 +104,16 @@ GEMINI_MODELS = {
 
 # Claude model definitions
 CLAUDE_MODELS = {
+    # Note: claude-3-sonnet-20240229 does not support batching
+    # Using other supported models
     "claude37s": "claude-3-7-sonnet-20250219",
     "claude35s": "claude-3-5-sonnet-20241022",
     "claude35h": "claude-3-5-haiku-20241022",
-    "claude30s": "claude-3-sonnet-20240229",
-    "claude30h": "claude-3-haiku-20240307",
-    # 2025/03/18: API利用コストが高額なため一時的に無効化
-    # 将来的に費用対効果が改善した場合は再度有効化を検討
-    # "claude30o": "claude-3-opus-20240229"
+    "claude30h": "claude-3-haiku-20240307"
+    
+    # Temporarily disabled models
+    # "claude30s": "claude-3-sonnet-20240229" # Does not support batching
+    # "claude30o": "claude-3-opus-20240229"   # Cost optimization
 }
 
 # DeepSeek model definitions

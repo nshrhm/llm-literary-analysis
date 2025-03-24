@@ -78,6 +78,11 @@ Note: Claude-3-Opus model (claude-3-opus-20240229) is temporarily disabled due t
     - 最大100,000リクエスト対応
     - 29日間の結果保持
     - エラーハンドリングとリカバリ
+    - 標準的なAPI機能のサポート：
+      - temperature
+      - max_tokens
+      - system messages
+      - prompt caching対応
   - Gemini: Vertex AI Batch Prediction (Planned)
   - Groq: Batch API (Planned)
   - kluster.ai: Adaptive Batch Processing (Planned)
