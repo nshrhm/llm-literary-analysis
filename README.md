@@ -83,9 +83,13 @@ Note: Claude-3-Opus model (claude-3-opus-20240229) is temporarily disabled due t
       - max_tokens
       - system messages
       - prompt caching対応
-  - Gemini: Vertex AI Batch Prediction (Planned)
-  - Groq: Batch API (Planned)
-  - kluster.ai: Adaptive Batch Processing (Planned)
+  - kluster.ai (In Progress):
+    - DeepSeek: Implementation in progress
+    - Llama: Scheduled for implementation
+    - OpenAI-compatible API interface
+    - JSONL format for batch requests
+    - 24-hour processing window
+    - Status monitoring and error handling
 
 Features:
 - Request Processing:
