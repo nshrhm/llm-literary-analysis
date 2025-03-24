@@ -53,7 +53,7 @@ def main():
             batch_status = runner.monitor_status(batch_request.id)
             
             # Save results
-            results_file = runner.save_results(
+            jsonl_path, txt_paths = runner.save_results(
                 batch_status=batch_status,
                 model_type="llama",
                 timestamp=timestamp
@@ -61,7 +61,8 @@ def main():
             
             print(f"Trial {trial} complete:")
             print(f"Input file: {input_file}")
-            print(f"Results file: {results_file}")
+            print(f"JSONL file: {jsonl_path}")
+            print(f"Generated {len(txt_paths)} TXT files")
 
 if __name__ == "__main__":
     main()

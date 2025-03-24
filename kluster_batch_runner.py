@@ -183,9 +183,9 @@ class KlusterBatchRunner:
         batch_status: Dict,
         model_type: str,
         timestamp: str = None
-    ) -> Optional[str]:
+    ) -> tuple[Optional[str], List[str]]:
         """
-        Save batch processing results.
+        Save batch results in both JSONL and TXT formats.
 
         Args:
             batch_status (Dict): Batch status information
@@ -193,11 +193,11 @@ class KlusterBatchRunner:
             timestamp (str, optional): Timestamp for filename. Defaults to current time.
 
         Returns:
-            Optional[str]: Path to the saved results file, or None if processing failed
+            tuple[Optional[str], List[str]]: Tuple of (jsonl_path, list of txt_paths), or (None, []) if failed
         """
         if batch_status.status.lower() != "completed":
             print(f"Batch failed with status: {batch_status.status}")
-            return None
+            return None, []
 
         if not timestamp:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -205,26 +205,48 @@ class KlusterBatchRunner:
         # Create directories if they don't exist
         results_dir = f"results/{model_type}/batch_results"
         os.makedirs(results_dir, exist_ok=True)
+        os.makedirs(f"results/{model_type}", exist_ok=True)
 
         # Get results and parse JSON
         result_file_id = batch_status.output_file_id
         results = self.client.files.content(result_file_id).content
         
-        # Parse each line and re-encode with proper Japanese handling
+        # Parse each line and process results
         processed_results = []
+        txt_paths = []
+        
         for line in results.decode().split('\n'):
             if line:
-                # Parse JSON and re-encode with Japanese support
+                # Parse JSON with Japanese support
                 result = json.loads(line)
                 processed_results.append(json.dumps(result, ensure_ascii=False))
+                
+                # Extract data for TXT file
+                custom_id = result["custom_id"]
+                response = result["response"]["body"]["choices"][0]["message"]["content"]
+                
+                # Save TXT file
+                txt_path = f"results/{model_type}/{custom_id}.txt"
+                with open(txt_path, "w", encoding="utf-8") as f:
+                    # Write metadata
+                    f.write(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                    f.write(f"persona: {custom_id.split('_')[0]}\n")
+                    f.write(f"model: {model_type}\n")
+                    f.write(f"trial: {custom_id.split('_')[3]}\n")
+                    f.write(f"temperature: {float(custom_id.split('_')[4].replace('temp',''))/100}\n")
+                    f.write(f"text: {custom_id.split('_')[2]}\n\n")
+                    # Write evaluation results
+                    f.write(response)
+                
+                txt_paths.append(txt_path)
         
-        # Save to file with proper encoding
-        results_path = f"{results_dir}/batch_results_{timestamp}.jsonl"
-        with open(results_path, "w", encoding="utf-8") as f:
+        # Save JSONL file
+        jsonl_path = f"{results_dir}/batch_results_{timestamp}.jsonl"
+        with open(jsonl_path, "w", encoding="utf-8") as f:
             for result in processed_results:
                 f.write(result + "\n")
 
-        return results_path
+        return jsonl_path, txt_paths
 
     def run_batch_job(
         self,
