@@ -83,13 +83,14 @@ Note: Claude-3-Opus model (claude-3-opus-20240229) is temporarily disabled due t
       - max_tokens
       - system messages
       - prompt caching対応
-  - kluster.ai (In Progress):
-    - DeepSeek: Implementation in progress
-    - Llama: Scheduled for implementation
+  - kluster.ai (Implemented):
+    - DeepSeek: R1 and V3 models
+    - Llama: 70B, 405B, and 8B models
     - OpenAI-compatible API interface
     - JSONL format for batch requests
     - 24-hour processing window
     - Status monitoring and error handling
+    - Automatic TXT file generation for aggregation
 
 Features:
 - Request Processing:
