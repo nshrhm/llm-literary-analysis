@@ -22,7 +22,7 @@
 
 1. Model Capability Check
 ```python
-def _create_model_batch(self, model_id, model_config):
+def _create_model_batch(self model_id model_config):
     # Adapt request format based on model capabilities
     if model_id in ['o3-mini']:
         # Remove temperature parameter
@@ -30,10 +30,26 @@ def _create_model_batch(self, model_id, model_config):
     elif model_id in ['o1-mini']:
         # Combine system and user messages
         request = create_request_without_system_role()
+    elif model_id.startswith('claude'):
+        # Claude models support standard parameters
+        request = create_claude_request(
+            model_config=model_config,
+            temperature=TEMPERATURE,  # Standard temperature support
+            max_tokens=1024,
+            system=system_message,
+            messages=user_messages
+        )
     else:
         # Use standard format
         request = create_standard_request()
 ```
+
+2. Claude-Specific Features
+- Temperature Support: 全モデルでtemperature対応 (0.0-1.0)
+- System Messages: ペルソナ設定用のシステムメッセージ対応
+- Batch Size: 最大100,000リクエスト
+- Result Retention: 29日間のデータ保持
+- Prompt Caching: コスト最適化のためのキャッシュ対応
 
 2. Batch Size Optimization
 ```python

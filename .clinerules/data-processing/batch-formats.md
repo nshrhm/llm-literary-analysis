@@ -4,6 +4,8 @@
 ファイル名パターン: `batch_requests_{model}.jsonl`
 
 ### リクエスト形式
+
+#### OpenAI形式
 ```jsonl
 {
   "custom_id": "p{persona}_{model}_n{trial}[_temp{temp}]_{text}",
@@ -20,6 +22,35 @@
     "temperature": {temp}  // text_generation型のみ
   }
 }
+```
+
+#### Claude形式
+```jsonl
+{
+  "custom_id": "p{persona}_{model}_n{trial}_temp{temp}_{text}",
+  "params": {
+    "model": "{model_name}",
+    "temperature": {temp},  // 全モデルでサポート
+    "max_tokens": 1024,
+    "system": [{
+      "type": "text",
+      "text": "{system_prompt}"
+    }],
+    "messages": [{
+      "role": "user",
+      "content": [{
+        "type": "text",
+        "text": "{prompt}"
+      }]
+    }]
+  }
+}
+
+// バッチ処理パラメータ
+batch_size_limit: 100000    // 最大リクエスト数
+batch_size_mb: 256         // 最大バッチサイズ
+retention_days: 29         // 結果保持期間
+processing_window: 24      // 処理時間ウィンドウ（時間）
 ```
 
 ## 結果ファイル

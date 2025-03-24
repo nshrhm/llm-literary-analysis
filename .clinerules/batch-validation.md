@@ -59,6 +59,15 @@ Validation Points:
 - Content array format
 - System role presence
 - Message structure
+- Temperature support (0.0-1.0)
+- Batch processing検証:
+  - リクエスト数: 最大100,000
+  - バッチサイズ: 最大256MB
+  - 処理時間: 24時間以内
+  - 結果保持: 29日間
+- Prompt caching検証:
+  - キャッシュヒット率
+  - コスト削減効果
 
 #### Gemini (83 results)
 - GenerationConfig usage
