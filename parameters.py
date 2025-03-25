@@ -119,7 +119,8 @@ CLAUDE_MODELS = {
 # DeepSeek model definitions
 DEEPSEEK_MODELS = {
     "deepseekr1": "deepseek-ai/DeepSeek-R1",
-    "deepseekv3": "deepseek-ai/DeepSeek-V3"
+    "deepseekv3": "deepseek-ai/DeepSeek-V3",
+    "deepseekv3-0324": "deepseek-ai/DeepSeek-V3-0324"
 }
 
 # Llama model definitions

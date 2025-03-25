@@ -1,11 +1,9 @@
-
-
-
-
 # Claude
 https://docs.anthropic.com/en/docs/build-with-claude/batch-processing
 
 # kluster.ai
+https://docs.kluster.ai/get-started/start-building/batch/
+
 from openai import OpenAI
 # OpenAI compatible API
 client = OpenAI(
