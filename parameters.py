@@ -72,19 +72,44 @@ MODEL_CONFIGS = {
 }
 
 
-# Persona definitions
+# Persona definitions with temperature settings
 PERSONAS = {
-    "p1": "大学１年生",
-    "p2": "文学研究者",
-    "p3": "感情豊かな詩人",
-    "p4": "無感情なロボット"
+    "p1": {
+        "name": "大学１年生",
+        "base_temperature": 0.7,
+        "description": "若く柔軟な発想を持つ大学1年生"
+    },
+    "p2": {
+        "name": "文学研究者",
+        "base_temperature": 0.3,
+        "description": "論理的で分析的な文学研究者"
+    },
+    "p3": {
+        "name": "感情豊かな詩人",
+        "base_temperature": 0.8,
+        "description": "繊細で感情豊かな詩人"
+    },
+    "p4": {
+        "name": "無感情なロボット",
+        "base_temperature": 0.2,
+        "description": "機械的で論理的なロボット"
+    }
 }
 
-# Text definitions
+# Text definitions with temperature modifiers
 TEXTS = {
-    "t1": "懐中時計",
-    "t2": "お金とピストル",
-    "t3": "ぼろぼろな駝鳥"
+    "t1": {
+        "name": "懐中時計",
+        "temperature_modifier": -0.1  # 寓話的なテキスト
+    },
+    "t2": {
+        "name": "お金とピストル",
+        "temperature_modifier": 0.0   # 物語的なテキスト
+    },
+    "t3": {
+        "name": "ぼろぼろな駝鳥",
+        "temperature_modifier": 0.1   # 詩的なテキスト
+    }
 }
 
 # Model definitions
@@ -166,8 +191,7 @@ OPENAI_MODELS = {
 }
 
 # Experiment parameters
-TRIALS = 1
-TEMPERATURE = 0.5
+TRIALS = 10  # 試行回数を10回に設定
 
 # Text content definitions
 TEXT_CONTENT = {

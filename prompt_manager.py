@@ -7,7 +7,13 @@ class PromptManager:
     """統一的なプロンプト管理を提供するクラス。"""
 
     @staticmethod
-    def get_prompt(model_type: str, persona_id: str, text_content: str, model_id: str = None) -> Dict[str, Any]:
+    def get_prompt(
+        model_type: str,
+        persona_id: str,
+        text_content: str,
+        text_id: str,
+        model_id: str = None
+    ) -> Dict[str, Any]:
         """
         指定されたモデルタイプとペルソナに対応するプロンプトを生成します。
 
@@ -15,6 +21,7 @@ class PromptManager:
             model_type: モデルタイプ（"openai", "claude", "gemini", "grok"など）
             persona_id: ペルソナID（"p1", "p2", "p3", "p4"）
             text_content: 分析対象のテキスト
+            text_id: テキストID（temperature調整用）
             model_id: 特定のモデルID（オプション）
 
         Returns:
@@ -22,7 +29,28 @@ class PromptManager:
         """
         base = PromptManager._get_base_prompt(text_content)
         system = PromptManager._get_system_prompt(persona_id)
-        return PromptManager._adapt_for_model(model_type, base, system, model_id)
+        temperature = PromptManager._calculate_temperature(persona_id, text_id)
+        return PromptManager._adapt_for_model(model_type, base, system, temperature, model_id)
+
+    @staticmethod
+    def _calculate_temperature(persona_id: str, text_id: str) -> float:
+        """
+        ペルソナとテキストタイプに基づいてtemperatureを計算します。
+
+        Args:
+            persona_id: ペルソナID
+            text_id: テキストID
+
+        Returns:
+            float: 計算されたtemperature値（0.0-1.0の範囲）
+        """
+        from parameters import PERSONAS, TEXTS
+        
+        base_temp = PERSONAS[persona_id]["base_temperature"]
+        modifier = TEXTS[text_id]["temperature_modifier"]
+        
+        # 0.0から1.0の範囲に収める
+        return max(0.0, min(1.0, base_temp + modifier))
     
     @staticmethod
     def _get_base_prompt(text_content: str) -> str:
@@ -41,6 +69,7 @@ class PromptManager:
         model_type: str,
         base: str,
         system: str,
+        temperature: float,
         model_id: Optional[str] = None
     ) -> Dict[str, Any]:
         """
@@ -63,15 +92,18 @@ class PromptManager:
         match model_config["format"]:
             case "messages":
                 # OpenAI標準フォーマット
-                return {
+                result = {
                     "messages": [
                         {"role": "system", "content": system},
                         {"role": "user", "content": base}
                     ]
                 }
+                if model_type != "openai" or model_config.get("temperature_support", True):
+                    result["temperature"] = temperature
+                return result
             case "combined":
                 # OpenAI o1-miniなど、system roleをサポートしないモデル用
-                return {
+                result = {
                     "messages": [
                         {
                             "role": "user",
@@ -79,14 +111,19 @@ class PromptManager:
                         }
                     ]
                 }
+                if model_type != "openai" or model_config.get("temperature_support", True):
+                    result["temperature"] = temperature
+                return result
             case "content":
                 # Claude形式
-                return {
+                result = {
                     "system": [{"type": "text", "text": system}],
                     "messages": [{
                         "role": "user",
                         "content": [{"type": "text", "text": base}]
                     }]
                 }
+                result["temperature"] = temperature
+                return result
             case format_type:
                 raise ValueError(f"Unsupported format type: {format_type}")
