@@ -31,6 +31,7 @@ class KlusterBatchRunner:
             base_url="https://api.kluster.ai/v1",
             api_key=self.api_key
         )
+        self.current_model = None  # Store current model for reference
 
     def create_batch_requests(
         self,
@@ -54,8 +55,14 @@ class KlusterBatchRunner:
         from parameters import TEXT_CONTENT, TEMPERATURE
         from prompt_manager import PromptManager
 
+        # Store current model
+        self.current_model = model
+
         # Determine model type
         model_type = "deepseek" if "deepseek" in model.lower() else "llama"
+
+        # Get model display name
+        model_display_name = self._get_model_display_name(model)
 
         requests = []
         for persona_id, text_id in persona_texts:
@@ -82,11 +89,42 @@ class KlusterBatchRunner:
                     "temperature": TEMPERATURE,
                     "max_completion_tokens": max_tokens,
                     **prompt
-                }
+                },
+                "model_display_name": model_display_name  # Add display name for reference
             }
             requests.append(request)
 
         return requests
+
+    def _get_model_display_name(self, model: str) -> str:
+        """
+        Get display name for the model.
+
+        Args:
+            model (str): Full model identifier
+
+        Returns:
+            str: Display name for the model
+        """
+        from parameters import DEEPSEEK_MODELS, LLAMA_MODELS
+
+        # Check DeepSeek models
+        for model_id, model_path in DEEPSEEK_MODELS.items():
+            if model_path == model:
+                if model_id == "deepseekr1":
+                    return "DeepSeek-R1"
+                elif model_id == "deepseekv3":
+                    return "DeepSeek-V3"
+                elif model_id == "deepseekv3-0324":
+                    return "DeepSeek-V3-0324"
+
+        # Check Llama models
+        for model_id, model_path in LLAMA_MODELS.items():
+            if model_path == model:
+                return f"Llama-{model_id}"
+
+        # Default to full path if not found
+        return model
 
     def save_batch_requests(
         self,
@@ -215,6 +253,9 @@ class KlusterBatchRunner:
         processed_results = []
         txt_paths = []
         
+        # Get model display name using stored current model
+        model_display_name = self._get_model_display_name(self.current_model)
+        
         for line in results.decode().split('\n'):
             if line:
                 # Parse JSON with Japanese support
@@ -231,7 +272,7 @@ class KlusterBatchRunner:
                     # Write metadata
                     f.write(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
                     f.write(f"persona: {custom_id.split('_')[0]}\n")
-                    f.write(f"model: {model_type}\n")
+                    f.write(f"model: {model_display_name}\n")  # Use display name
                     f.write(f"trial: {custom_id.split('_')[3]}\n")
                     f.write(f"temperature: {float(custom_id.split('_')[4].replace('temp',''))/100}\n")
                     f.write(f"text: {custom_id.split('_')[2]}\n\n")

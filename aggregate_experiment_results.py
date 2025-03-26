@@ -74,7 +74,13 @@ def process_file(filepath):
             elif line.startswith('text:'):
                 data['text'] = line.replace('text:', '').strip()
             elif line.startswith('model:'):
-                data['model'] = line.replace('model:', '').strip()
+                # モデル名を正規化
+                model = line.replace('model:', '').strip()
+                # DeepSeekモデルの場合、完全な名前を使用
+                if model.startswith('DeepSeek'):
+                    data['model'] = model
+                else:
+                    data['model'] = model.split('/')[-1] if '/' in model else model
             elif line.startswith('trial:'):
                 data['trial'] = line.replace('trial:', '').strip()
             elif line.startswith('temperature:'):
