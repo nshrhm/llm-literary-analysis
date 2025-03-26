@@ -121,7 +121,12 @@ class KlusterBatchRunner:
         # Check Llama models
         for model_id, model_path in LLAMA_MODELS.items():
             if model_path == model:
-                return f"Llama-{model_id}"
+                if model_id == "llama33-70Bit":
+                    return "Llama-3.3-70B"
+                elif model_id == "llama31-405Bit":
+                    return "Llama-3.1-405B"
+                elif model_id == "llama31-8Bit":
+                    return "Llama-3.1-8B"
 
         # Default to full path if not found
         return model
