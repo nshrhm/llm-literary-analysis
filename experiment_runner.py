@@ -78,10 +78,12 @@ class BaseExperimentRunner:
             result: The response from the model
             params: Dictionary containing experiment parameters
                    use_temperature: Boolean indicating if temperature should be included
+                   temperature: Float value of the temperature used
         """
         # Generate filename based on whether temperature should be included
         if params.get('use_temperature', True):
-            filename = f"{params['persona_key']}_{params['model_key']}_n{params['trial']:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}.txt"
+            temp_value = params.get('temperature', 0.5)  # デフォルト値として0.5を使用
+            filename = f"{params['persona_key']}_{params['model_key']}_n{params['trial']:02d}_temp{int(temp_value*100):02d}_{params['text_key']}.txt"
         else:
             filename = f"{params['persona_key']}_{params['model_key']}_n{params['trial']:02d}_{params['text_key']}.txt"
         
@@ -108,7 +110,8 @@ class BaseExperimentRunner:
         
         # Add temperature only if it should be included
         if params.get('use_temperature', True):
-            content_parts.append(f"temperature: {TEMPERATURE}")
+            temp_value = params.get('temperature', 0.5)  # デフォルト値として0.5を使用
+            content_parts.append(f"temperature: {temp_value}")
         
         # Add remaining content
         content_parts.extend([
@@ -156,23 +159,29 @@ class GeminiExperimentRunner(BaseExperimentRunner):
             model = genai.GenerativeModel(model_name)
             generation_config = genai.GenerationConfig(temperature=TEMPERATURE)
             
-            for persona_key, persona in PERSONAS.items():
-                for text_key, text_name in TEXTS.items():
+            for persona_key, persona_info in PERSONAS.items():
+                for text_key, text_info in TEXTS.items():
                     text_content = TEXT_CONTENT[text_key]
-                    prompt = PromptManager.get_prompt("gemini", persona_key, text_content, model_key)
+                    prompt = PromptManager.get_prompt("gemini", persona_key, text_content, text_key, model_key)
                     
                     for trial in range(1, TRIALS + 1):
                         try:
-                            response = model.generate_content(prompt["messages"][0]["content"], generation_config=generation_config)
+                            response = model.generate_content(
+                                prompt["messages"][0]["content"],
+                                generation_config=genai.GenerationConfig(
+                                    temperature=prompt.get("temperature", 0.5)
+                                )
+                            )
                             
                             params = {
                                 "persona_key": persona_key,
                                 "text_key": text_key,
                                 "model_key": model_key,
                                 "trial": trial,
-                                "persona": persona,
-                                "text_name": text_name,
-                                "model": model_name
+                                "persona": persona_info["name"],
+                                "text_name": text_info["name"],
+                                "model": model_name,
+                                "temperature": prompt.get("temperature", 0.5)
                             }
                             
                             self.save_result(response.text, params)
@@ -210,16 +219,16 @@ class GrokExperimentRunner(BaseExperimentRunner):
     def run_experiment(self):
         """Run the experiment with Grok models."""
         for model_key, model_name in GROK_MODELS.items():
-            for persona_key, persona in PERSONAS.items():
-                for text_key, text_name in TEXTS.items():
+            for persona_key, persona_info in PERSONAS.items():
+                for text_key, text_info in TEXTS.items():
                     text_content = TEXT_CONTENT[text_key]
-                    prompt = PromptManager.get_prompt("grok", persona_key, text_content, model_key)
+                    prompt = PromptManager.get_prompt("grok", persona_key, text_content, text_key, model_key)
                     
                     for trial in range(1, TRIALS + 1):
                         try:
                             response = self.client.chat.completions.create(
                                 model=model_name,
-                                temperature=TEMPERATURE,
+                                temperature=prompt.get("temperature", 0.5),
                                 messages=prompt["messages"]
                             )
                             
@@ -228,9 +237,10 @@ class GrokExperimentRunner(BaseExperimentRunner):
                                 "text_key": text_key,
                                 "model_key": model_key,
                                 "trial": trial,
-                                "persona": persona,
-                                "text_name": text_name,
-                                "model": model_name
+                                "persona": persona_info["name"],
+                                "text_name": text_info["name"],
+                                "model": model_name,
+                                "temperature": prompt.get("temperature", 0.5)
                             }
                             
                             self.save_result(response.choices[0].message.content, params)
@@ -261,17 +271,17 @@ class ClaudeExperimentRunner(BaseExperimentRunner):
     def run_experiment(self):
         """Run the experiment with Claude models."""
         for model_key, model_name in CLAUDE_MODELS.items():
-            for persona_key, persona in PERSONAS.items():
-                for text_key, text_name in TEXTS.items():
+            for persona_key, persona_info in PERSONAS.items():
+                for text_key, text_info in TEXTS.items():
                     text_content = TEXT_CONTENT[text_key]
-                    prompt = PromptManager.get_prompt("claude", persona_key, text_content, model_key)
+                    prompt = PromptManager.get_prompt("claude", persona_key, text_content, text_key, model_key)
                     
                     for trial in range(1, TRIALS + 1):
                         try:
                             response = self.client.messages.create(
                                 model=model_name,
                                 max_tokens=1000,
-                                temperature=TEMPERATURE,
+                                temperature=prompt.get("temperature", 0.5),
                                 messages=prompt["messages"]
                             )
                             
@@ -280,9 +290,10 @@ class ClaudeExperimentRunner(BaseExperimentRunner):
                                 "text_key": text_key,
                                 "model_key": model_key,
                                 "trial": trial,
-                                "persona": persona,
-                                "text_name": text_name,
-                                "model": model_name
+                                "persona": persona_info["name"],
+                                "text_name": text_info["name"],
+                                "model": model_name,
+                                "temperature": prompt.get("temperature", 0.5)
                             }
                             
                             self.save_result(response.content[0].text, params)
@@ -344,17 +355,17 @@ class DeepSeekExperimentRunner(BaseExperimentRunner):
     def run_experiment(self):
         """Run the experiment with DeepSeek models."""
         for model_key, model_name in DEEPSEEK_MODELS.items():
-            for persona_key, persona in PERSONAS.items():
-                for text_key, text_name in TEXTS.items():
+            for persona_key, persona_info in PERSONAS.items():
+                for text_key, text_info in TEXTS.items():
                     text_content = TEXT_CONTENT[text_key]
-                    prompt = PromptManager.get_prompt("deepseek", persona_key, text_content, model_key)
+                    prompt = PromptManager.get_prompt("deepseek", persona_key, text_content, text_key, model_key)
                     
                     for trial in range(1, TRIALS + 1):
                         try:
                             response = self.client.chat.completions.create(
                                 model=model_name,
                                 max_tokens=1000,
-                                temperature=TEMPERATURE,
+                                temperature=prompt.get("temperature", 0.5),
                                 messages=prompt["messages"]
                             )
                             
@@ -363,9 +374,10 @@ class DeepSeekExperimentRunner(BaseExperimentRunner):
                                 "text_key": text_key,
                                 "model_key": model_key,
                                 "trial": trial,
-                                "persona": persona,
-                                "text_name": text_name,
-                                "model": model_name
+                                "persona": persona_info["name"],
+                                "text_name": text_info["name"],
+                                "model": model_name,
+                                "temperature": prompt.get("temperature", 0.5)
                             }
                             
                             self.save_result(response.choices[0].message.content, params)
@@ -399,10 +411,10 @@ class OpenAIExperimentRunner(BaseExperimentRunner):
         for model_key, model_info in OPENAI_MODELS.items():
             model_name = model_info["model_name"]
             
-            for persona_key, persona in PERSONAS.items():
-                for text_key, text_name in TEXTS.items():
+            for persona_key, persona_info in PERSONAS.items():
+                for text_key, text_info in TEXTS.items():
                     text_content = TEXT_CONTENT[text_key]
-                    prompt = PromptManager.get_prompt("openai", persona_key, text_content, model_key)
+                    prompt = PromptManager.get_prompt("openai", persona_key, text_content, text_key, model_key)
                     
                     for trial in range(1, TRIALS + 1):
                         try:
@@ -413,11 +425,13 @@ class OpenAIExperimentRunner(BaseExperimentRunner):
                                     model=model_name,
                                     messages=prompt["messages"]
                                 )
+                                temp_value = None
                             else:
                                 # text_generation型モデルはtemperatureパラメータを使用
+                                temp_value = prompt.get("temperature", 0.5)
                                 response = self.client.chat.completions.create(
                                     model=model_name,
-                                    temperature=TEMPERATURE,
+                                    temperature=temp_value,
                                     messages=prompt["messages"]
                                 )
                             
@@ -426,11 +440,13 @@ class OpenAIExperimentRunner(BaseExperimentRunner):
                                 "text_key": text_key,
                                 "model_key": model_key,
                                 "trial": trial,
-                                "persona": persona,
-                                "text_name": text_name,
+                                "persona": persona_info["name"],
+                                "text_name": text_info["name"],
                                 "model": model_name,
                                 "use_temperature": model_info["type"] == "text_generation"
                             }
+                            if model_info["type"] == "text_generation":
+                                params["temperature"] = temp_value
                             
                             self.save_result(response.choices[0].message.content, params)
                             print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}")
@@ -463,17 +479,17 @@ class LlamaExperimentRunner(BaseExperimentRunner):
     def run_experiment(self):
         """Run the experiment with Llama models."""
         for model_key, model_name in LLAMA_MODELS.items():
-            for persona_key, persona in PERSONAS.items():
-                for text_key, text_name in TEXTS.items():
+            for persona_key, persona_info in PERSONAS.items():
+                for text_key, text_info in TEXTS.items():
                     text_content = TEXT_CONTENT[text_key]
-                    prompt = PromptManager.get_prompt("llama", persona_key, text_content, model_key)
+                    prompt = PromptManager.get_prompt("llama", persona_key, text_content, text_key, model_key)
                     
                     for trial in range(1, TRIALS + 1):
                         try:
                             response = self.client.chat.completions.create(
                                 model=model_name,
                                 max_tokens=1000,
-                                temperature=TEMPERATURE,
+                                temperature=prompt.get("temperature", 0.5),
                                 messages=prompt["messages"]
                             )
                             
@@ -482,13 +498,14 @@ class LlamaExperimentRunner(BaseExperimentRunner):
                                 "text_key": text_key,
                                 "model_key": model_key,
                                 "trial": trial,
-                                "persona": persona,
-                                "text_name": text_name,
-                                "model": model_name
+                                "persona": persona_info["name"],
+                                "text_name": text_info["name"],
+                                "model": model_name,
+                                "temperature": prompt.get("temperature", 0.5)
                             }
                             
                             self.save_result(response.choices[0].message.content, params)
-                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}")
+                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(params['temperature']*100):02d}_{params['text_key']}")
                             
                         except Exception as e:
                             print(f"Error in trial {trial} with {model_name}: {str(e)}")
