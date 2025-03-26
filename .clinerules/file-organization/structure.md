@@ -21,7 +21,7 @@ aggregated_results/   # 集計結果
 ├── aggregated_llama_YYYYMMDD_HHMMSS.csv
 └── aggregated_deepseek_YYYYMMDD_HHMMSS.csv
 
-src/
+# プログラムファイル
 ├── experiment_runner.py     # 統合実験ランナー
 ├── kluster_batch_runner.py  # Kluster.ai用バッチランナー
 ├── check_models.py         # モデル可用性チェック
