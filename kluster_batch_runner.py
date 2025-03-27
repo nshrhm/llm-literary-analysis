@@ -48,6 +48,12 @@ class KlusterBatchRunner:
         # Check DeepSeek models
         for model_id, model_path in DEEPSEEK_MODELS.items():
             if model_path == model:
+                if model_id == "deepseekr1":
+                    return "deepseekr1"
+                elif model_id == "deepseekv3":
+                    return "deepseekv3"
+                elif model_id == "deepseekv3-0324":
+                    return "deepseekv3-0324"
                 return model_id
 
         # Check Llama models
@@ -112,7 +118,7 @@ class KlusterBatchRunner:
         Returns:
             List[Dict]: List of formatted batch requests
         """
-        from parameters import TEXT_CONTENT, TEMPERATURE
+        from parameters import TEXT_CONTENT, PERSONAS, TEXTS
         from prompt_manager import PromptManager
 
         # Store current model
@@ -124,8 +130,13 @@ class KlusterBatchRunner:
 
         requests = []
         for persona_id, text_id in persona_texts:
+            # Calculate temperature from persona and text settings
+            base_temp = PERSONAS[persona_id]["base_temperature"]
+            temp_modifier = TEXTS[text_id]["temperature_modifier"]
+            temperature = base_temp + temp_modifier
+
             # Generate custom ID with model identifier
-            custom_id = f"{persona_id}_{model_identifier}_{text_id}_{trial_num}_temp{int(TEMPERATURE*100)}"
+            custom_id = f"{persona_id}_{model_identifier}_{text_id}_{trial_num}_temp{int(temperature*100)}"
 
             # Get text content
             text_content = TEXT_CONTENT[text_id]
@@ -134,7 +145,8 @@ class KlusterBatchRunner:
             prompt = PromptManager.get_prompt(
                 model_type="deepseek" if "deepseek" in model.lower() else "llama",
                 persona_id=persona_id,
-                text_content=text_content
+                text_content=text_content,
+                text_id=text_id
             )
 
             # Create request
@@ -144,7 +156,7 @@ class KlusterBatchRunner:
                 "url": "/v1/chat/completions",
                 "body": {
                     "model": model,
-                    "temperature": TEMPERATURE,
+                    "temperature": temperature,
                     "max_completion_tokens": max_tokens,
                     **prompt
                 },

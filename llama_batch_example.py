@@ -16,7 +16,7 @@ def main():
     runner = KlusterBatchRunner()
 
     # Get model definitions
-    from parameters import LLAMA_MODELS
+    from parameters import LLAMA_MODELS, TRIALS
 
     # Create persona-text combinations
     personas = ["p1", "p2", "p3", "p4"]  # Personas 1-4
@@ -30,7 +30,7 @@ def main():
         print(f"\nRunning batch job for {model_id}...")
         
         # Create batch requests for each trial
-        for trial in range(1, 4):  # 3 trials
+        for trial in range(1, TRIALS + 1):  # Use TRIALS from parameters
             trial_num = f"n{trial:02d}"
             
             # Create and process batch requests

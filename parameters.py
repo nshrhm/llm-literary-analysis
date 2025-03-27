@@ -81,17 +81,17 @@ PERSONAS = {
     },
     "p2": {
         "name": "文学研究者",
-        "base_temperature": 0.3,
+        "base_temperature": 0.4,
         "description": "論理的で分析的な文学研究者"
     },
     "p3": {
         "name": "感情豊かな詩人",
-        "base_temperature": 0.8,
+        "base_temperature": 0.9,
         "description": "繊細で感情豊かな詩人"
     },
     "p4": {
         "name": "無感情なロボット",
-        "base_temperature": 0.2,
+        "base_temperature": 0.1,
         "description": "機械的で論理的なロボット"
     }
 }
@@ -100,69 +100,19 @@ PERSONAS = {
 TEXTS = {
     "t1": {
         "name": "懐中時計",
-        "temperature_modifier": -0.1  # 寓話的なテキスト
+        "temperature_modifier": 0.0  # 寓話的なテキストを踏まえてえ変更も可能
     },
     "t2": {
         "name": "お金とピストル",
-        "temperature_modifier": 0.0   # 物語的なテキスト
+        "temperature_modifier": 0.0   # 物語的なテキストを踏まえてえ変更も可能
     },
     "t3": {
         "name": "ぼろぼろな駝鳥",
-        "temperature_modifier": 0.1   # 詩的なテキスト
+        "temperature_modifier": 0.0   # 詩的なテキストを踏まえてえ変更も可能
     }
 }
 
 # Model definitions
-GROK_MODELS = {
-    "grok20l": "grok-2-latest",
-}
-
-GEMINI_MODELS = {
-    "gemma30": "gemma-3-27b-it",
-    "gemini20fte": "gemini-2.0-flash-thinking-exp",
-    "gemini20pe": "gemini-2.0-pro-exp",
-    "gemini20fl": "gemini-2.0-flash-lite-001",
-    "gemini20f": "gemini-2.0-flash-001",
-    "gemini15f": "gemini-1.5-flash-8b-latest",
-    "gemini15p": "gemini-1.5-pro-latest"
-}
-
-# Claude model definitions
-CLAUDE_MODELS = {
-    # Note: claude-3-sonnet-20240229 does not support batching
-    # Using other supported models
-    "claude37s": "claude-3-7-sonnet-20250219",
-    "claude35s": "claude-3-5-sonnet-20241022",
-    "claude35h": "claude-3-5-haiku-20241022",
-    "claude30h": "claude-3-haiku-20240307"
-    
-    # Temporarily disabled models
-    # "claude30s": "claude-3-sonnet-20240229" # Does not support batching
-    # "claude30o": "claude-3-opus-20240229"   # Cost optimization
-}
-
-# DeepSeek model definitions
-DEEPSEEK_MODELS = {
-    "deepseekr1": "deepseek-ai/DeepSeek-R1",
-    "deepseekv3": "deepseek-ai/DeepSeek-V3",
-    "deepseekv3-0324": "deepseek-ai/DeepSeek-V3-0324"
-}
-
-# Llama model definitions
-LLAMA_MODELS = {
-    "llama33-70Bit": "klusterai/Meta-Llama-3.3-70B-Instruct-Turbo",
-    "llama31-405Bit": "klusterai/Meta-Llama-3.1-405B-Instruct-Turbo",
-    "llama31-8Bit": "klusterai/Meta-Llama-3.1-8B-Instruct-Turbo"
-}
-
-# Model type definitions
-MODEL_TYPES = {
-    "grok": GROK_MODELS,
-    "gemini": GEMINI_MODELS,
-    "claude": CLAUDE_MODELS,
-    "deepseek": DEEPSEEK_MODELS,
-    "llama": LLAMA_MODELS
-}
 
 # OpenAI model definitions
 OPENAI_MODELS = {
@@ -190,8 +140,59 @@ OPENAI_MODELS = {
     }
 }
 
+# Claude model definitions
+CLAUDE_MODELS = {
+    # Note: claude-3-sonnet-20240229 does not support batching
+    # Using other supported models
+    "claude37s": "claude-3-7-sonnet-20250219",
+    "claude35s": "claude-3-5-sonnet-20241022",
+    "claude35h": "claude-3-5-haiku-20241022",
+    "claude30h": "claude-3-haiku-20240307"
+    
+    # Temporarily disabled models
+    # "claude30s": "claude-3-sonnet-20240229" # Does not support batching
+    # "claude30o": "claude-3-opus-20240229"   # Cost optimization
+}
+
+GEMINI_MODELS = {
+    "gemma30": "gemma-3-27b-it",
+    "gemini20fte": "gemini-2.0-flash-thinking-exp",
+    "gemini20pe": "gemini-2.0-pro-exp",
+    "gemini20fl": "gemini-2.0-flash-lite-001",
+    "gemini20f": "gemini-2.0-flash-001",
+    "gemini15f": "gemini-1.5-flash-8b-latest",
+    "gemini15p": "gemini-1.5-pro-latest"
+}
+
+GROK_MODELS = {
+    "grok20l": "grok-2-latest",
+}
+
+# DeepSeek model definitions
+DEEPSEEK_MODELS = {
+    "deepseekr1": "deepseek-ai/DeepSeek-R1",
+    "deepseekv3": "deepseek-ai/DeepSeek-V3",
+    "deepseekv3-0324": "deepseek-ai/DeepSeek-V3-0324"
+}
+
+# Llama model definitions
+LLAMA_MODELS = {
+    "llama33-70Bit": "klusterai/Meta-Llama-3.3-70B-Instruct-Turbo",
+    "llama31-405Bit": "klusterai/Meta-Llama-3.1-405B-Instruct-Turbo",
+    "llama31-8Bit": "klusterai/Meta-Llama-3.1-8B-Instruct-Turbo"
+}
+
 # Experiment parameters
 TRIALS = 10  # 試行回数を10回に設定
+
+# Model type definitions
+MODEL_TYPES = {
+    "grok": GROK_MODELS,
+    "gemini": GEMINI_MODELS,
+    "claude": CLAUDE_MODELS,
+    "deepseek": DEEPSEEK_MODELS,
+    "llama": LLAMA_MODELS
+}
 
 # Text content definitions
 TEXT_CONTENT = {

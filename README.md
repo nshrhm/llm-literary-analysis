@@ -31,6 +31,7 @@
 ### kluster.ai DeepSeek
 - DeepSeek-R1
 - DeepSeek-V3
+- DeepSeek-V3-0324
 
 ### kluster.ai Meta Llama
 - Llama 3.3: 70B Instruct Turbo
@@ -180,9 +181,13 @@ python llama_example.py     # Llama実験の実行
 
 2. バッチ処理によるOpenAI実験の実行（50%コスト削減）：
 ```bash
-python openai_example.py --batch                    # バッチ処理で実行
+python openai_example.py --batch                    # OpenAIバッチ処理の実行
 python openai_example.py --status <batch_id>        # バッチジョブのステータス確認
 python openai_example.py --cancel <batch_id>        # 進行中のバッチジョブのキャンセル
+
+# DeepSeekとLlamaモデルのバッチ処理実行
+python deepseek_batch_example.py    # DeepSeekバッチ処理の実行（3モデル × 10トライアル）
+python llama_batch_example.py       # Llamaバッチ処理の実行（3モデル × 10トライアル）
 ```
 
 3. すべてのモデルでの実験実行：
@@ -258,8 +263,8 @@ aggregated_results/
 ├── aggregated_claude_[timestamp].csv     （60結果）
 ├── aggregated_gemini_[timestamp].csv     （83結果）
 ├── aggregated_grok_[timestamp].csv       （12結果）
-├── aggregated_deepseek_[timestamp].csv   （24結果）
-└── aggregated_llama_[timestamp].csv      （36結果）
+├── aggregated_deepseek_[timestamp].csv   （360結果: 3モデル × 4ペルソナ × 3テキスト × 10トライアル）
+└── aggregated_llama_[timestamp].csv      （360結果: 3モデル × 4ペルソナ × 3テキスト × 10トライアル）
 ```
 
 各CSVファイルには以下が含まれます：
