@@ -156,6 +156,11 @@ llm-literary-analysis/
 ├── check_models.py               # モデル可用性チェッカー
 ├── parameters.py                 # 実験パラメータ
 ├── aggregate_experiment_results.py # 結果分析ツール
+├── tools/                        # ユーティリティツール
+│   ├── openai/                   # OpenAI専用ツール
+│   │   ├── batch_cleanup.py     # バッチ管理ツール
+│   │   └── tests/              # OpenAIツールのテスト
+│   └── shared/                   # 共有ツール
 └── results/                      # 実験結果
     ├── gemini/                   # Gemini結果
     ├── claude/                   # Claude結果
@@ -206,6 +211,18 @@ python check_models.py
 ```bash
 python aggregate_experiment_results.py results/  # すべての結果を集計
 python aggregate_experiment_results.py results/deepseek  # DeepSeekの結果のみを集計
+
+2. OpenAIバッチリソースのクリーンアップ：
+```bash
+# 特定のバッチを削除
+python tools/openai/batch_cleanup.py --batch-id <batch_id>
+
+# すべてのバッチを削除
+python tools/openai/batch_cleanup.py --all
+
+# 最大50件のバッチを削除
+python tools/openai/batch_cleanup.py --all --limit 50
+```
 ```
 
 このスクリプトは、すべての結果ファイルを処理し、以下を含むCSVファイルを生成します：
