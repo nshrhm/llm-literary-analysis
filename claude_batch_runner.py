@@ -22,51 +22,30 @@ class ClaudeBatchRunner:
         
     def _create_batch_requests(self, model_id, model_config, timestamp):
         """Create batch requests for Claude API."""
-        from parameters import TEXT_CONTENT, PERSONAS, TEMPERATURE
+        from parameters import TEXT_CONTENT, PERSONAS, TEXTS
         
         requests = []
-        for persona_id, persona in PERSONAS.items():
-            for text_id, text_content in TEXT_CONTENT.items():
-                custom_id = f"{persona_id}_{model_id}_{text_id}_n01"
+        for persona_id, persona_info in PERSONAS.items():
+            for text_id, text_info in TEXTS.items():
+                text_content = TEXT_CONTENT[text_id]
                 
-                # Prepare content
-                content = [{
-                    "type": "text",
-                    "text": f"""以下のテキストを読んで、4つの感情（面白さ、驚き、悲しみ、怒り）について0-100の数値で評価し、
-その理由も説明してください。
-
-テキスト：
-{text_content}
-
-回答は以下の形式で記述してください：
-Q1. 面白さ(数値): [0-100]
-Q1. 面白さ(理由): [説明]
-
-Q2. 驚き(数値): [0-100]
-Q2. 驚き(理由): [説明]
-
-Q3. 悲しみ(数値): [0-100]
-Q3. 悲しみ(理由): [説明]
-
-Q4. 怒り(数値): [0-100]
-Q4. 怒り(理由): [説明]"""
-                }]
-
+                # PromptManagerを使用してプロンプトを生成
+                prompt = PromptManager.get_prompt("claude", persona_id, text_content, text_id, model_id)
+                
+                # temperatureを取得
+                temp_value = prompt.get("temperature", 0.5)
+                
+                # カスタムIDを生成
+                custom_id = f"{persona_id}_{model_id}_{text_id}_n01_temp{int(temp_value*100)}"
+                
                 # Create request
                 request = Request(
                     custom_id=custom_id,
                     params=MessageCreateParamsNonStreaming(
                         model=model_config,  # CLAUDEモデルは直接モデル名を使用
                         max_tokens=1024,
-                        temperature=TEMPERATURE,
-                        system=[{
-                            "type": "text",
-                            "text": f"あなたは{persona}です。日本の文学テキストに対する感情分析を行います。"
-                        }],
-                        messages=[{
-                            "role": "user",
-                            "content": content
-                        }]
+                        temperature=temp_value,
+                        **prompt
                     )
                 )
                 requests.append(request)

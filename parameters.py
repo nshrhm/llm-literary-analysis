@@ -32,11 +32,18 @@ MODEL_CONFIGS = {
     "openai": {
         "standard": {
             "max_tokens": 1024,
-            "format": "messages"
+            "format": "messages",
+            "temperature_support": True  # 明示的に設定
         },
         "o1-mini": {
             "max_tokens": 1024,
-            "format": "combined"  # system+userを結合
+            "format": "combined",  # system+userを結合
+            "temperature_support": False  # 明示的に設定
+        },
+        "reasoning": {
+            "max_tokens": 1024,
+            "format": "combined",  # system+userを結合
+            "temperature_support": False  # reasoningモデル用の共通設定
         }
     },
     "claude": {
@@ -104,11 +111,11 @@ TEXTS = {
     },
     "t2": {
         "name": "お金とピストル",
-        "temperature_modifier": 0.0   # 物語的なテキストを踏まえてえ変更も可能
+        "temperature_modifier": 0.0  # 物語的なテキストを踏まえてえ変更も可能
     },
     "t3": {
         "name": "ぼろぼろな駝鳥",
-        "temperature_modifier": 0.0   # 詩的なテキストを踏まえてえ変更も可能
+        "temperature_modifier": 0.0  # 詩的なテキストを踏まえてえ変更も可能
     }
 }
 
@@ -129,12 +136,14 @@ OPENAI_MODELS = {
     "o3-mini": {
          "model_name": "o3-mini",
          "type": "reasoning",
-         "temperature_support": False,
+         "config_type": "reasoning",  # 設定タイプを明示的に指定
+         "temperature_support": False,  # このモデルはtemperatureパラメータをサポートしない
          "endpoint": "https://api.openai.com/v1/engines/o3-mini/completions"
     },
     "o1-mini": {
          "model_name": "o1-mini",
          "type": "reasoning",
+         "config_type": "reasoning",  # 設定タイプを明示的に指定
          "temperature_support": False,
          "endpoint": "https://api.openai.com/v1/engines/o1-mini/completions"
     }
@@ -185,13 +194,16 @@ LLAMA_MODELS = {
 # Experiment parameters
 TRIALS = 10  # 試行回数を10回に設定
 
-# Model type definitions
+# Model type definitions (Reserved for future unified model selection)
+# Currently not used in the codebase as of 2025-03
+# Planned usage: Provider-agnostic model configuration
 MODEL_TYPES = {
     "grok": GROK_MODELS,
     "gemini": GEMINI_MODELS,
-    "claude": CLAUDE_MODELS,
+    "claude": CLAUDE_MODELS, 
     "deepseek": DEEPSEEK_MODELS,
     "llama": LLAMA_MODELS
+    # "openai": OPENAI_MODELS  # Temporarily excluded due to different structure
 }
 
 # Text content definitions

@@ -1,30 +1,30 @@
-## Batch Processing Guidelines
+## バッチ処理ガイドライン
 
-## Core Principles
+## コア原則
 
-1. Single Model Per Batch
-   - Each batch must contain requests for a single model only
-   - Separate batches for different model versions
-   - Use consistent model identifiers across the system
+1. 単一モデルのバッチ処理
+   - 各バッチは単一のモデルのみを含む
+   - 異なるモデルは別バッチで処理
+   - システム全体で一貫したモデル識別子を使用
 
-2. Model Identification
-   - Use standardized model identifiers
-   - Maintain mapping between identifiers and display names
-   - Follow consistent naming conventions
+2. モデル識別
+   - 標準化されたモデル識別子を使用
+   - 識別子と表示名のマッピングを維持
+   - 一貫した命名規則に従う
 
-3. File Naming and Organization
-   - Use standardized file naming patterns
-   - Include model identifiers in filenames
-   - Maintain metadata consistency
+3. ファイル命名と構成
+   - 標準化されたファイル命名パターン
+   - モデル識別子をファイル名に含める
+   - メタデータの一貫性を維持
 
-## Implementation Notes
+## 実装ノート
 
-### Model Identifier Handling
+### モデル識別子の処理
 
-1. Model Identifier Format
+1. モデル識別子フォーマット
 ```python
 def _get_model_identifier(model: str) -> str:
-    # DeepSeek models
+    # DeepSeekモデル
     if model_id == "deepseekr1":
         return "deepseekr1"
     elif model_id == "deepseekv3":
@@ -32,7 +32,7 @@ def _get_model_identifier(model: str) -> str:
     elif model_id == "deepseekv3-0324":
         return "deepseekv3-0324"
 
-    # Llama models
+    # Llamaモデル
     if model_id == "llama33-70Bit":
         return "llama33-70Bit"
     elif model_id == "llama31-405Bit":
@@ -41,10 +41,10 @@ def _get_model_identifier(model: str) -> str:
         return "llama31-8Bit"
 ```
 
-2. Display Name Generation
+2. 表示名生成
 ```python
 def _get_model_display_name(model: str) -> str:
-    # DeepSeek display names
+    # DeepSeek表示名
     if model_id == "deepseekr1":
         return "DeepSeek-R1"
     elif model_id == "deepseekv3":
@@ -52,7 +52,7 @@ def _get_model_display_name(model: str) -> str:
     elif model_id == "deepseekv3-0324":
         return "DeepSeek-V3-0324"
 
-    # Llama display names
+    # Llama表示名
     if model_id == "llama33-70Bit":
         return "Llama-3.3-70B"
     elif model_id == "llama31-405Bit":
@@ -61,19 +61,21 @@ def _get_model_display_name(model: str) -> str:
         return "Llama-3.1-8B"
 ```
 
-### Request Formatting
+### リクエストフォーマット
 
-1. Model-Specific Adaptations
+1. モデル固有の適応（2025-03-27更新）
 ```python
 def create_batch_requests(model: str, ...) -> List[Dict]:
-    # Get model identifier and display name
+    # モデル識別子と表示名を取得
     model_identifier = _get_model_identifier(model)
     model_display_name = _get_model_display_name(model)
 
-    # Generate custom ID with model identifier
-    custom_id = f"{persona_id}_{model_identifier}_{text_id}_{trial_num}_temp{temperature}"
+    # モデル固有のカスタムID生成
+    custom_id = f"{persona_id}_{model_identifier}_{text_id}_{trial_num}"
+    if not is_reasoning_model(model_identifier):
+        custom_id += f"_temp{temperature}"
 
-    # Create request with model display name
+    # モデル表示名を含むリクエスト作成
     request = {
         "custom_id": custom_id,
         "model_display_name": model_display_name,
@@ -81,53 +83,53 @@ def create_batch_requests(model: str, ...) -> List[Dict]:
     }
 ```
 
-### Error Handling
+### エラーハンドリング
 
-1. Validation Rules
-   - Verify model identifier format
-   - Check display name consistency
-   - Validate file naming patterns
+1. バリデーションルール
+   - モデル識別子フォーマットの検証
+   - 表示名の一貫性チェック
+   - ファイル命名パターンの検証
 
-2. Processing Checks
-   - Ensure model type consistency
-   - Verify metadata format
-   - Check identifier mapping
+2. 処理チェック
+   - モデルタイプの一貫性確認
+   - メタデータフォーマットの検証
+   - 識別子マッピングの確認
 
-3. Result Management
-   - Validate model names in results
-   - Ensure consistent display names
-   - Check file naming compliance
+3. 結果管理
+   - 結果内のモデル名の検証
+   - 表示名の一貫性確保
+   - ファイル命名規則の遵守
 
-## Best Practices
+## ベストプラクティス
 
-1. Model Identification
-   - Use consistent identifier formats
-   - Maintain clear identifier-display name mapping
-   - Document model naming conventions
+1. モデル識別
+   - 一貫した識別子フォーマットを使用
+   - 明確な識別子-表示名マッピングを維持
+   - モデル命名規則を文書化
 
-2. File Organization
-   - Follow standardized naming patterns
-   - Include model identifiers in paths
-   - Maintain metadata consistency
+2. ファイル構成
+   - 標準化された命名パターンに従う
+   - パスにモデル識別子を含める
+   - メタデータの一貫性を維持
 
-3. Documentation
-   - Document model identifiers
-   - Keep naming conventions updated
-   - Maintain identifier mappings
+3. ドキュメント
+   - モデル識別子を文書化
+   - 命名規則を最新に保つ
+   - 識別子マッピングを維持
 
-## Result Management
+## 結果管理
 
-1. File Naming
-   - Use model identifiers in filenames
-   - Follow standardized patterns
-   - Include all required components
+1. ファイル命名
+   - ファイル名にモデル識別子を使用
+   - 標準化されたパターンに従う
+   - 必要なコンポーネントをすべて含める
 
-2. Metadata
-   - Include model display names
-   - Maintain consistent format
-   - Document version information
+2. メタデータ
+   - モデル表示名を含める
+   - 一貫したフォーマットを維持
+   - バージョン情報を文書化
 
-3. Aggregation
-   - Use display names in reports
-   - Maintain model grouping
-   - Ensure version tracking
+3. 集計
+   - レポートで表示名を使用
+   - モデルグループ化を維持
+   - バージョン追跡を確保

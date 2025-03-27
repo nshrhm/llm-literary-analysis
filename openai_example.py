@@ -13,6 +13,7 @@ def main():
     parser.add_argument("--batch", action="store_true", help="Use batch processing (50% cost reduction)")
     parser.add_argument("--cancel", help="Cancel a batch job with the specified batch ID")
     parser.add_argument("--status", help="Check status of a batch job with the specified batch ID")
+    parser.add_argument("--model", choices=list(OPENAI_MODELS.keys()), help="Specify a single model to run")
     args = parser.parse_args()
 
     try:
@@ -57,12 +58,19 @@ def main():
                 return
 
         # Create and run OpenAI experiment
-        print(f"Starting OpenAI experiment with {len(OPENAI_MODELS)} models...")
+        if args.model:
+            # 単一モデルの実行
+            models = {args.model: OPENAI_MODELS[args.model]}
+            print(f"Starting OpenAI experiment with model: {args.model}")
+        else:
+            # 全モデルの実行
+            models = OPENAI_MODELS
+            print(f"Starting OpenAI experiment with {len(OPENAI_MODELS)} models...")
         
         if args.batch:
             print("Using batch processing (50% cost reduction enabled)...")
             runner = OpenAIBatchRunner()
-            runner.run_batch_experiment()
+            runner.run_batch_experiment(models)
         else:
             print("Using standard processing (consider using --batch for 50% cost reduction)...")
             runner = OpenAIExperimentRunner()

@@ -37,6 +37,11 @@
 - Llama 3.3: 70B Instruct Turbo
 - Llama 3.1: 405B Instruct Turbo, 8B Instruct Turbo
 
+### 将来の拡張計画
+- プロバイダー非依存のモデル選択機能実装予定
+- 統一モデルインターフェース(MODEL_TYPES)の活用
+- OpenAIモデルの統合対応
+
 ## 機能
 
 ### コア機能
@@ -74,6 +79,10 @@
     - すべてのOpenAIモデルのサポート：
       - 標準モデル（gpt-4o, gpt-4o-mini）
       - 制限付きモデル（o3-mini：温度パラメータなし、o1-mini：システムロールなし）
+    - バッチ結果の自動変換：
+      - JSONLからテキストファイルへの変換
+      - Unicodeエスケープの自動解決
+      - 推論モデル用のtemperature: None対応
   - Claude：Message Batches API（実装済み）
     - バッチリクエストの生成と管理
     - 最大100,000リクエスト対応
@@ -159,6 +168,7 @@ llm-literary-analysis/
 ├── tools/                        # ユーティリティツール
 │   ├── openai/                   # OpenAI専用ツール
 │   │   ├── batch_cleanup.py     # バッチ管理ツール
+│   │   ├── batch_result_converter.py  # バッチ結果変換ツール
 │   │   └── tests/              # OpenAIツールのテスト
 │   └── shared/                   # 共有ツール
 └── results/                      # 実験結果
@@ -166,6 +176,8 @@ llm-literary-analysis/
     ├── claude/                   # Claude結果
     ├── grok/                     # Grok結果
     ├── openai/                   # OpenAI結果
+    │   ├── batch_results/       # バッチ処理結果（JSONL）
+    │   └── *.txt                # 変換済み結果ファイル
     ├── deepseek/                 # DeepSeek結果
     └── llama/                    # Llama結果
 ```
@@ -189,6 +201,9 @@ python llama_example.py     # Llama実験の実行
 python openai_example.py --batch                    # OpenAIバッチ処理の実行
 python openai_example.py --status <batch_id>        # バッチジョブのステータス確認
 python openai_example.py --cancel <batch_id>        # 進行中のバッチジョブのキャンセル
+
+# バッチ結果の変換（JSONLからテキストファイルへ）
+python tools/openai/batch_result_converter.py results/openai/batch_results/<batch_id>_output.jsonl
 
 # DeepSeekとLlamaモデルのバッチ処理実行
 python deepseek_batch_example.py    # DeepSeekバッチ処理の実行（3モデル × 10トライアル）
@@ -243,13 +258,16 @@ results/
 ├── grok/
 │   └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
 ├── openai/
-│   └── p{persona}_{model}_n{trial}[_temp{temp}]_{text}.txt
+│   ├── batch_results/
+│   │   └── batch_{id}_output.jsonl  # バッチ処理の生結果
+│   └── p{persona}_{model}_n{trial}[_temp{temp}]_{text}.txt  # 変換済み結果
 ├── deepseek/
 │   └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
 └── llama/
     └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
 
-注：OpenAI推論モデル（o3-mini、o1-mini）では、これらのモデルが温度設定を使用しないため、ファイル名から温度パラメータが省略されます。
+注：OpenAI推論モデル（o3-mini、o1-mini）では、これらのモデルが温度設定を使用しないため、
+ファイル名から温度パラメータが省略され、結果ファイル内で"temperature: None"として記録されます。
 ```
 
 #### 結果ファイル
@@ -259,7 +277,7 @@ timestamp: [YYYY-MM-DD HH:MM:SS]
 persona: [ペルソナ名]
 model: [モデル名]
 trial: [試行番号]
-temperature: [温度値]
+temperature: [温度値 or None（推論モデルの場合）]
 text: [テキスト名]
 Q1value: [0-100]
 Q1reason: [面白さの理由]

@@ -98,7 +98,14 @@ class PromptManager:
                         {"role": "user", "content": base}
                     ]
                 }
-                if model_type != "openai" or model_config.get("temperature_support", True):
+                # モデルタイプとモデルIDに基づいてtemperature_supportを判定
+                from parameters import OPENAI_MODELS
+                if model_type == "openai" and model_id in OPENAI_MODELS:
+                    temperature_support = OPENAI_MODELS[model_id].get("temperature_support", False)
+                else:
+                    temperature_support = model_config.get("temperature_support", False)
+
+                if temperature_support:
                     result["temperature"] = temperature
                 return result
             case "combined":
@@ -111,7 +118,14 @@ class PromptManager:
                         }
                     ]
                 }
-                if model_type != "openai" or model_config.get("temperature_support", True):
+                # モデルタイプとモデルIDに基づいてtemperature_supportを判定
+                from parameters import OPENAI_MODELS
+                if model_type == "openai" and model_id in OPENAI_MODELS:
+                    temperature_support = OPENAI_MODELS[model_id].get("temperature_support", False)
+                else:
+                    temperature_support = model_config.get("temperature_support", False)
+
+                if temperature_support:
                     result["temperature"] = temperature
                 return result
             case "content":
@@ -123,7 +137,10 @@ class PromptManager:
                         "content": [{"type": "text", "text": base}]
                     }]
                 }
-                result["temperature"] = temperature
+                # temperature_supportの判定
+                temperature_support = model_config.get("temperature_support", False)
+                if temperature_support:
+                    result["temperature"] = temperature
                 return result
             case format_type:
                 raise ValueError(f"Unsupported format type: {format_type}")

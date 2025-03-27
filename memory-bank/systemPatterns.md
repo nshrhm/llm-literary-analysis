@@ -1,139 +1,178 @@
-# System Patterns
+# システムパターン
 
-## Batch Processing Patterns
+## アーキテクチャパターン
 
-### 1. Model-Specific Request Adaptation (2025/03/22)
-
-#### Pattern: Dynamic Request Format
-```python
-def create_request(model_id, params):
-    if model_id in MODEL_LIMITATIONS:
-        return adapt_request(params, MODEL_LIMITATIONS[model_id])
-    return create_standard_request(params)
+### バッチ処理システム
+```mermaid
+graph TD
+    A[バッチリクエスト生成] --> B[JSONLファイル作成]
+    B --> C[バッチジョブ作成]
+    C --> D[ステータス監視]
+    D --> E{完了判定}
+    E -->|完了| F[結果取得]
+    E -->|未完了| D
+    F --> G[結果変換]
+    G --> H[個別ファイル保存]
 ```
 
-#### Use Cases
-- OpenAI o3-mini: Remove temperature parameter
-- OpenAI o1-mini: Adapt system role messages
-- Future model adaptations
+1. リクエスト生成
+   - モデル固有のフォーマット適用
+   - パラメータ検証
+   - カスタムID生成
 
-#### Benefits
-- Flexible request handling
-- Error prevention
-- Maintainable code
+2. バッチ処理
+   - JSONLフォーマット使用
+   - 非同期処理
+   - ステータス管理
 
-### 2. Batch Progress Monitoring
+3. 結果処理（2025-03-27更新）
+   - JSONLからテキストへの変換
+   - Unicodeエスケープ解決
+   - temperature: None対応
+   - メタデータの標準化
 
-#### Pattern: Status Polling with Backoff
-```python
-def monitor_batch(batch_id):
-    while not is_complete(batch_id):
-        status = check_status(batch_id)
-        if status.needs_retry:
-            apply_backoff()
-        yield status
+### 結果管理システム
+```mermaid
+graph TD
+    A[結果ファイル] --> B{フォーマット判定}
+    B -->|JSONL| C[バッチ結果変換]
+    B -->|TXT| D[直接処理]
+    C --> E[メタデータ抽出]
+    D --> E
+    E --> F[結果検証]
+    F --> G[集計処理]
 ```
 
-#### Use Cases
-- Long-running batch jobs
-- Rate limit handling
-- Status tracking
+1. ファイル構造
+   - モデル別ディレクトリ
+   - 標準化されたファイル名
+   - メタデータ形式
 
-#### Benefits
-- Efficient resource usage
-- Reliable monitoring
-- Error recovery
+2. データフロー
+   - バッチ結果の変換
+   - メタデータの抽出
+   - 結果の検証
+   - 集計処理
 
-### 3. Result Processing Pipeline
+## 実装パターン
 
-#### Pattern: Multi-format Result Handler
+### バッチ処理
+1. リクエスト生成
 ```python
-def process_results(batch_results):
-    # Save raw results
-    save_jsonl_results(batch_results)
-    
-    # Process individual results
-    for result in batch_results:
-        # Convert to standard format
-        processed = convert_to_standard_format(result)
-        # Save in required format
-        save_txt_result(processed)
+def create_batch_request(model_type, requests):
+    if model_type == "openai":
+        return create_openai_batch(requests)
+    elif model_type == "claude":
+        return create_claude_batch(requests)
+    elif model_type == "klusterai":
+        return create_klusterai_batch(requests)
 ```
 
-#### Use Cases
-- Format conversion
-- Result validation
-- Data aggregation
-
-#### Benefits
-- Format consistency
-- Easy aggregation
-- Error tracking
-
-### 4. Error Recovery Strategy
-
-#### Pattern: Tiered Error Handling
+2. 結果変換（2025-03-27更新）
 ```python
-def handle_error(error, context):
-    if is_model_limitation(error):
-        return adapt_request_format(context)
-    if is_temporary_error(error):
-        return retry_with_backoff(context)
-    if is_partial_failure(error):
-        return handle_partial_results(context)
-    raise UnrecoverableError(error)
+def convert_batch_results(input_file):
+    """Convert batch results from JSONL to individual text files."""
+    with open(input_file, 'r') as f:
+        for line in f:
+            data = json.loads(line)
+            # Extract metadata
+            metadata = extract_metadata(data)
+            # Handle temperature
+            if is_reasoning_model(metadata['model']):
+                metadata['temperature'] = None
+            # Convert and save
+            save_result_file(metadata, data['content'])
 ```
 
-#### Use Cases
-- Model limitations
-- API errors
-- Partial failures
-
-#### Benefits
-- Graceful degradation
-- Maximum data recovery
-- Clear error patterns
-
-### 5. Resource Management
-
-#### Pattern: Automatic Cleanup
+### エラーハンドリング
+1. バッチ処理エラー
 ```python
-def manage_resources(batch_job):
-    try:
-        process_batch(batch_job)
-    finally:
-        cleanup_temp_files()
-        release_resources()
+def handle_batch_error(batch_id, error):
+    if is_partial_success(error):
+        save_partial_results(batch_id)
+        retry_failed_requests(batch_id)
+    else:
+        handle_complete_failure(batch_id)
 ```
 
-#### Use Cases
-- Temporary file management
-- Resource allocation
-- Memory management
+2. 変換エラー
+```python
+def handle_conversion_error(file_id, error):
+    log_error(file_id, error)
+    if is_recoverable(error):
+        retry_conversion(file_id)
+    else:
+        mark_as_failed(file_id)
+```
 
-#### Benefits
-- Resource efficiency
-- Reliable cleanup
-- Error resilience
+## データパターン
 
-## Application Guidelines
+### メタデータ形式
+```python
+metadata = {
+    'timestamp': 'YYYY-MM-DD HH:MM:SS',
+    'persona': 'p1-p4',
+    'model': 'model_name',
+    'trial': 'n01-n10',
+    'temperature': float or None,  # 2025-03-27: None for reasoning models
+    'text': 't1-t3'
+}
+```
 
-1. Model Support
-   - Check model limitations
-   - Implement appropriate adaptations
-   - Document restrictions
+### 結果フォーマット
+```
+timestamp: [timestamp]
+persona: [persona_id]
+model: [model_id]
+trial: [trial_number]
+temperature: [value or None]
+text: [text_id]
 
-2. Error Management
-   - Define error categories
-   - Implement recovery strategies
-   - Log error patterns
+Q1value: [0-100]
+Q1reason: [explanation]
+...
+Q4value: [0-100]
+Q4reason: [explanation]
+```
 
-3. Resource Optimization
-   - Monitor resource usage
-   - Implement cleanup
-   - Track performance
+## モニタリングパターン
 
-4. Documentation
-   - Update pattern documentation
-   - Record known issues
-   - Share best practices
+### バッチ処理監視
+1. ステータスチェック
+```python
+def check_batch_status(batch_id):
+    status = get_batch_status(batch_id)
+    if status.is_complete:
+        process_results(batch_id)
+    elif status.has_error:
+        handle_batch_error(batch_id)
+    else:
+        schedule_next_check(batch_id)
+```
+
+2. エラー追跡
+```python
+def track_errors(batch_id):
+    errors = collect_errors(batch_id)
+    log_errors(errors)
+    notify_if_critical(errors)
+    update_error_stats(errors)
+```
+
+## 拡張パターン
+
+### 新規モデル追加
+1. バッチ処理サポート
+```python
+def add_model_support(model_config):
+    register_batch_handler(model_config)
+    register_result_converter(model_config)
+    update_monitoring(model_config)
+```
+
+2. 結果変換サポート
+```python
+def add_converter_support(model_config):
+    register_metadata_handler(model_config)
+    register_content_converter(model_config)
+    register_validation_rules(model_config)
