@@ -161,6 +161,101 @@ def track_errors(batch_id):
 
 ## 拡張パターン
 
+### プロンプト制御パターン（2025-04-11追加）
+```mermaid
+graph TD
+    A[システムメッセージ] --> D[プロンプト構築]
+    B[ユーザーメッセージ] --> D
+    C[形式指定] --> D
+    D --> E[強化プロンプト]
+    E --> F{モデル実行}
+    F --> G[応答検証]
+    G -->|OK| H[結果保存]
+    G -->|NG| I[再試行]
+```
+
+1. プロンプト強化実装
+```python
+def create_enhanced_prompt(system_msg, user_msg):
+    """プロンプトの強化と構造化"""
+    return f"""
+{system_msg}
+
+重要：必ず以下の形式で回答してください。各項目の数値を必ず記入してください。
+
+{user_msg}
+
+注意：
+- 必ず数値を[0-100]の範囲で明示的に記入してください
+- 各項目の(数値)と(理由)を明確に分けて記述してください
+- 形式は厳密に守ってください
+"""
+```
+
+2. メッセージ分離パターン
+```python
+def separate_messages(prompt):
+    """システムメッセージとユーザーメッセージの分離"""
+    return {
+        "messages": [
+            {"role": "system", "content": prompt.system},
+            {"role": "user", "content": prompt.user}
+        ]
+    }
+```
+
+### 応答抽出パターン（2025-04-11追加）
+1. 柔軟なパターンマッチング
+```python
+def create_patterns(question):
+    """複数のパターンマッチング形式を定義"""
+    return [
+        rf"Q\d+\.\s*{question}\(数値\):\s*(\d+)",  # 標準形式
+        rf"Q\d+\.\s*{question}:\s*\(数値\):\s*(\d+)",  # 代替形式1
+        rf"Q\d+\.\s*{question}\s*数値:\s*(\d+)",  # 代替形式2
+        rf"Q\d+\.\s*{question}:\s*(\d+)",  # シンプル形式
+        rf"{question}(?:の評価)?(?:\s*[:：]\s*|\s+)(\d+)",  # 日本語形式1
+        rf"{question}(?:度|レベル)(?:\s*[:：]\s*|\s+)(\d+)",  # 日本語形式2
+        rf"「{question}」\s*[:：]?\s*(\d+)",  # 括弧形式
+        rf"\[{question}\]\s*[:：]?\s*(\d+)"  # 角括弧形式
+    ]
+```
+
+2. 段階的マッチング処理
+```python
+def extract_value(text, question):
+    """段階的なパターンマッチングの適用"""
+    patterns = create_patterns(question)
+    for pattern in patterns:
+        if match := re.search(pattern, text, re.MULTILINE):
+            return match.group(1)
+    return ""
+```
+
+### 品質保証パターン（2025-04-11追加）
+1. 応答検証
+```python
+def validate_response(response):
+    """応答の品質検証"""
+    required_fields = ["面白さ", "驚き", "悲しみ", "怒り"]
+    for field in required_fields:
+        value = extract_value(response, field)
+        if not value or not (0 <= int(value) <= 100):
+            return False
+    return True
+```
+
+2. エラー回復
+```python
+def handle_invalid_response(model, prompt, max_retries=3):
+    """無効な応答のリカバリー"""
+    for attempt in range(max_retries):
+        response = model.generate_content(prompt)
+        if validate_response(response):
+            return response
+    raise ValidationError("Maximum retries exceeded")
+```
+
 ### 新規モデル追加
 1. バッチ処理サポート
 ```python
@@ -176,3 +271,4 @@ def add_converter_support(model_config):
     register_metadata_handler(model_config)
     register_content_converter(model_config)
     register_validation_rules(model_config)
+```

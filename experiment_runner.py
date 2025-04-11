@@ -39,7 +39,11 @@ class BaseExperimentRunner:
             rf"Q\d+\.\s*{question}\(数値\):\s*(\d+)",  # Q1. 面白さ(数値): 80
             rf"Q\d+\.\s*{question}:\s*\(数値\):\s*(\d+)",  # Q1. 面白さ: (数値): 80
             rf"Q\d+\.\s*{question}\s*数値:\s*(\d+)",  # Q1. 面白さ 数値: 80
-            rf"Q\d+\.\s*{question}:\s*(\d+)",  # Q1. 面白さ: 80 - フォールバックパターン
+            rf"Q\d+\.\s*{question}:\s*(\d+)",  # Q1. 面白さ: 80
+            rf"{question}(?:の評価)?(?:\s*[:：]\s*|\s+)(\d+)",  # 面白さ: 80 or 面白さの評価: 80
+            rf"{question}(?:度|レベル)(?:\s*[:：]\s*|\s+)(\d+)",  # 面白さ度: 80 or 面白さレベル: 80
+            rf"「{question}」\s*[:：]?\s*(\d+)",  # 「面白さ」: 80
+            rf"\[{question}\]\s*[:：]?\s*(\d+)",  # [面白さ]: 80
         ]
         
         for pattern in patterns:
@@ -156,9 +160,6 @@ class GeminiExperimentRunner(BaseExperimentRunner):
     def run_experiment(self):
         """Run the experiment with Gemini models."""
         for model_key, model_name in GEMINI_MODELS.items():
-            model = genai.GenerativeModel(model_name)
-            generation_config = genai.GenerationConfig(temperature=0.5)  # デフォルト値として0.5を使用
-            
             for persona_key, persona_info in PERSONAS.items():
                 for text_key, text_info in TEXTS.items():
                     text_content = TEXT_CONTENT[text_key]
@@ -166,12 +167,44 @@ class GeminiExperimentRunner(BaseExperimentRunner):
                     
                     for trial in range(1, TRIALS + 1):
                         try:
+                            # ペルソナと文章タイプに基づいて温度を計算
+                            base_temp = PERSONAS[persona_key]["base_temperature"]
+                            temp_modifier = TEXTS[text_key]["temperature_modifier"]
+                            temperature = base_temp + temp_modifier
+                            
+                            # モデルの設定と生成
+                            model = genai.GenerativeModel(model_name=model_name)
+                            # プロンプトの準備と強化
+                            system = prompt["messages"][0]["content"]
+                            user = prompt["messages"][1]["content"]
+                            
+                            # 形式を強調したプロンプト
+                            enhanced_prompt = f"""
+{system}
+
+重要：必ず以下の形式で回答してください。各項目の数値を必ず記入してください。
+
+{user}
+
+注意：
+- 必ず数値を[0-100]の範囲で明示的に記入してください
+- 各項目の(数値)と(理由)を明確に分けて記述してください
+- 形式は厳密に守ってください
+"""
+                            
                             response = model.generate_content(
-                                prompt["messages"][0]["content"],
-                                generation_config=genai.GenerationConfig(
-                                    temperature=prompt.get("temperature", 0.5)
+                                contents=[
+                                    {"role": "user", "parts": [{"text": enhanced_prompt}]}
+                                ],
+                                generation_config=genai.types.GenerationConfig(
+                                    temperature=temperature
                                 )
                             )
+                            
+                            # 応答の取得と確認
+                            if not response.text:
+                                raise ValueError("Empty response from model")
+                            full_response = response.text
                             
                             params = {
                                 "persona_key": persona_key,
@@ -181,10 +214,10 @@ class GeminiExperimentRunner(BaseExperimentRunner):
                                 "persona": persona_info["name"],
                                 "text_name": text_info["name"],
                                 "model": model_name,
-                                "temperature": prompt.get("temperature", 0.5)
+                                "temperature": temperature
                             }
                             
-                            self.save_result(response.text, params)
+                            self.save_result(full_response, params)
                             # Progress message based on whether temperature is used
                             if params.get('use_temperature', True):
                                 print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(params['temperature']*100):02d}_{params['text_key']}")
@@ -192,7 +225,9 @@ class GeminiExperimentRunner(BaseExperimentRunner):
                                 print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_{params['text_key']}")
                             
                         except Exception as e:
-                            print(f"Error in trial {trial} with {model_name}: {str(e)}")
+                            print(f"Error in trial {trial} with {model_name}")
+                            print(f"Error type: {type(e).__name__}")
+                            print(f"Error details: {str(e)}")
                             continue
 
 class GrokExperimentRunner(BaseExperimentRunner):
@@ -226,9 +261,14 @@ class GrokExperimentRunner(BaseExperimentRunner):
                     
                     for trial in range(1, TRIALS + 1):
                         try:
+                            # ペルソナと文章タイプに基づいて温度を計算
+                            base_temp = PERSONAS[persona_key]["base_temperature"]
+                            temp_modifier = TEXTS[text_key]["temperature_modifier"]
+                            temperature = base_temp + temp_modifier
+
                             response = self.client.chat.completions.create(
                                 model=model_name,
-                                temperature=prompt.get("temperature", 0.5),  # temperatureキーが存在しない場合のフォールバック
+                                temperature=temperature,
                                 messages=prompt["messages"]
                             )
                             
@@ -240,7 +280,7 @@ class GrokExperimentRunner(BaseExperimentRunner):
                                 "persona": persona_info["name"],
                                 "text_name": text_info["name"],
                                 "model": model_name,
-                                "temperature": prompt.get("temperature", 0.5)
+                                "temperature": temperature
                             }
                             
                             self.save_result(response.choices[0].message.content, params)
@@ -278,10 +318,15 @@ class ClaudeExperimentRunner(BaseExperimentRunner):
                     
                     for trial in range(1, TRIALS + 1):
                         try:
+                            # ペルソナと文章タイプに基づいて温度を計算
+                            base_temp = PERSONAS[persona_key]["base_temperature"]
+                            temp_modifier = TEXTS[text_key]["temperature_modifier"]
+                            temperature = base_temp + temp_modifier
+
                             response = self.client.messages.create(
                                 model=model_name,
                                 max_tokens=1000,
-                                temperature=prompt.get("temperature", 0.5),
+                                temperature=temperature,
                                 messages=prompt["messages"]
                             )
                             
@@ -293,7 +338,7 @@ class ClaudeExperimentRunner(BaseExperimentRunner):
                                 "persona": persona_info["name"],
                                 "text_name": text_info["name"],
                                 "model": model_name,
-                                "temperature": prompt.get("temperature", 0.5)
+                                "temperature": temperature
                             }
                             
                             self.save_result(response.content[0].text, params)
@@ -362,10 +407,15 @@ class DeepSeekExperimentRunner(BaseExperimentRunner):
                     
                     for trial in range(1, TRIALS + 1):
                         try:
+                            # ペルソナと文章タイプに基づいて温度を計算
+                            base_temp = PERSONAS[persona_key]["base_temperature"]
+                            temp_modifier = TEXTS[text_key]["temperature_modifier"]
+                            temperature = base_temp + temp_modifier
+
                             response = self.client.chat.completions.create(
                                 model=model_name,
                                 max_tokens=1000,
-                                temperature=prompt.get("temperature", 0.5),
+                                temperature=temperature,
                                 messages=prompt["messages"]
                             )
                             
@@ -377,7 +427,7 @@ class DeepSeekExperimentRunner(BaseExperimentRunner):
                                 "persona": persona_info["name"],
                                 "text_name": text_info["name"],
                                 "model": model_name,
-                                "temperature": prompt.get("temperature", 0.5)
+                                "temperature": temperature
                             }
                             
                             self.save_result(response.choices[0].message.content, params)
@@ -428,7 +478,9 @@ class OpenAIExperimentRunner(BaseExperimentRunner):
                                 temp_value = None
                             else:
                                 # text_generation型モデルはtemperatureパラメータを使用
-                                temp_value = prompt["temperature"]
+                                base_temp = PERSONAS[persona_key]["base_temperature"]
+                                temp_modifier = TEXTS[text_key]["temperature_modifier"]
+                                temp_value = base_temp + temp_modifier
                                 response = self.client.chat.completions.create(
                                     model=model_name,
                                     temperature=temp_value,
@@ -490,10 +542,15 @@ class LlamaExperimentRunner(BaseExperimentRunner):
                     
                     for trial in range(1, TRIALS + 1):
                         try:
+                            # ペルソナと文章タイプに基づいて温度を計算
+                            base_temp = PERSONAS[persona_key]["base_temperature"]
+                            temp_modifier = TEXTS[text_key]["temperature_modifier"]
+                            temperature = base_temp + temp_modifier
+
                             response = self.client.chat.completions.create(
                                 model=model_name,
                                 max_tokens=1000,
-                                temperature=prompt["temperature"],
+                                temperature=temperature,
                                 messages=prompt["messages"]
                             )
                             
@@ -505,7 +562,7 @@ class LlamaExperimentRunner(BaseExperimentRunner):
                                 "persona": persona_info["name"],
                                 "text_name": text_info["name"],
                                 "model": model_name,
-                                "temperature": prompt["temperature"]
+                                "temperature": temperature
                             }
                             
                             self.save_result(response.choices[0].message.content, params)
