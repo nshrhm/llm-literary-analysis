@@ -157,7 +157,7 @@ class GeminiExperimentRunner(BaseExperimentRunner):
         """Run the experiment with Gemini models."""
         for model_key, model_name in GEMINI_MODELS.items():
             model = genai.GenerativeModel(model_name)
-            generation_config = genai.GenerationConfig(temperature=TEMPERATURE)
+            generation_config = genai.GenerationConfig(temperature=0.5)  # デフォルト値として0.5を使用
             
             for persona_key, persona_info in PERSONAS.items():
                 for text_key, text_info in TEXTS.items():
@@ -187,7 +187,7 @@ class GeminiExperimentRunner(BaseExperimentRunner):
                             self.save_result(response.text, params)
                             # Progress message based on whether temperature is used
                             if params.get('use_temperature', True):
-                                print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}")
+                                print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(params['temperature']*100):02d}_{params['text_key']}")
                             else:
                                 print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_{params['text_key']}")
                             
@@ -228,7 +228,7 @@ class GrokExperimentRunner(BaseExperimentRunner):
                         try:
                             response = self.client.chat.completions.create(
                                 model=model_name,
-                                temperature=prompt.get("temperature", 0.5),
+                                temperature=prompt.get("temperature", 0.5),  # temperatureキーが存在しない場合のフォールバック
                                 messages=prompt["messages"]
                             )
                             
@@ -244,7 +244,7 @@ class GrokExperimentRunner(BaseExperimentRunner):
                             }
                             
                             self.save_result(response.choices[0].message.content, params)
-                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}")
+                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(params['temperature']*100):02d}_{params['text_key']}")
                             
                         except Exception as e:
                             print(f"Error in trial {trial} with {model_name}: {str(e)}")
@@ -297,7 +297,7 @@ class ClaudeExperimentRunner(BaseExperimentRunner):
                             }
                             
                             self.save_result(response.content[0].text, params)
-                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}")
+                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(params['temperature']*100):02d}_{params['text_key']}")
                             
                         except Exception as e:
                             print(f"Error in trial {trial} with {model_name}: {str(e)}")
@@ -381,7 +381,7 @@ class DeepSeekExperimentRunner(BaseExperimentRunner):
                             }
                             
                             self.save_result(response.choices[0].message.content, params)
-                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}")
+                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(params['temperature']*100):02d}_{params['text_key']}")
                             
                         except Exception as e:
                             print(f"Error in trial {trial} with {model_name}: {str(e)}")
@@ -428,7 +428,7 @@ class OpenAIExperimentRunner(BaseExperimentRunner):
                                 temp_value = None
                             else:
                                 # text_generation型モデルはtemperatureパラメータを使用
-                                temp_value = prompt.get("temperature", 0.5)
+                                temp_value = prompt["temperature"]
                                 response = self.client.chat.completions.create(
                                     model=model_name,
                                     temperature=temp_value,
@@ -449,7 +449,11 @@ class OpenAIExperimentRunner(BaseExperimentRunner):
                                 params["temperature"] = temp_value
                             
                             self.save_result(response.choices[0].message.content, params)
-                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(TEMPERATURE*100):02d}_{params['text_key']}")
+                            # Progress message based on whether temperature is used
+                            if params.get('use_temperature', True):
+                                print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(params['temperature']*100):02d}_{params['text_key']}")
+                            else:
+                                print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_{params['text_key']}")
                             
                         except Exception as e:
                             print(f"Error in trial {trial} with {model_name}: {str(e)}")
@@ -489,7 +493,7 @@ class LlamaExperimentRunner(BaseExperimentRunner):
                             response = self.client.chat.completions.create(
                                 model=model_name,
                                 max_tokens=1000,
-                                temperature=prompt.get("temperature", 0.5),
+                                temperature=prompt["temperature"],
                                 messages=prompt["messages"]
                             )
                             
@@ -501,7 +505,7 @@ class LlamaExperimentRunner(BaseExperimentRunner):
                                 "persona": persona_info["name"],
                                 "text_name": text_info["name"],
                                 "model": model_name,
-                                "temperature": prompt.get("temperature", 0.5)
+                                "temperature": prompt["temperature"]
                             }
                             
                             self.save_result(response.choices[0].message.content, params)

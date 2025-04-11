@@ -103,7 +103,8 @@ class PromptManager:
                 if model_type == "openai" and model_id in OPENAI_MODELS:
                     temperature_support = OPENAI_MODELS[model_id].get("temperature_support", False)
                 else:
-                    temperature_support = model_config.get("temperature_support", False)
+                    # デフォルトでTrue（OpenAI以外のモデルは基本的にtemperatureをサポート）
+                    temperature_support = True
 
                 if temperature_support:
                     result["temperature"] = temperature
@@ -123,7 +124,8 @@ class PromptManager:
                 if model_type == "openai" and model_id in OPENAI_MODELS:
                     temperature_support = OPENAI_MODELS[model_id].get("temperature_support", False)
                 else:
-                    temperature_support = model_config.get("temperature_support", False)
+                    # デフォルトでTrue（OpenAI以外のモデルは基本的にtemperatureをサポート）
+                    temperature_support = True
 
                 if temperature_support:
                     result["temperature"] = temperature
@@ -138,7 +140,8 @@ class PromptManager:
                     }]
                 }
                 # temperature_supportの判定
-                temperature_support = model_config.get("temperature_support", False)
+                # デフォルトでTrue（OpenAI以外のモデルは基本的にtemperatureをサポート）
+                temperature_support = True
                 if temperature_support:
                     result["temperature"] = temperature
                 return result

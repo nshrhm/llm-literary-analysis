@@ -38,10 +38,6 @@ ENV/
 *_api_key.txt
 *.key
 
-# Results directory
-results/
-!results/.gitkeep
-
 # Generated files
 aggregated_*.csv
 
@@ -53,4 +49,10 @@ aggregated_*.csv
 .Trashes
 ehthumbs.db
 Thumbs.db
-# Documentation\ndocs/
+
+# Results directory
+results/
+!results/.gitkeep
+
+# Documentation
+docs/

@@ -174,7 +174,14 @@ GEMINI_MODELS = {
 }
 
 GROK_MODELS = {
+    # Grok 2シリーズ（8 requests/second）
     "grok20l": "grok-2-latest",
+    
+    # Grok 3シリーズ（5 requests/second）
+    "grok3mf": "grok-3-mini-fast-latest",
+    "grok3m": "grok-3-mini-latest",
+    "grok3f": "grok-3-fast-latest",
+    "grok3": "grok-3-latest"
 }
 
 # DeepSeek model definitions
@@ -186,9 +193,11 @@ DEEPSEEK_MODELS = {
 
 # Llama model definitions
 LLAMA_MODELS = {
-    "llama33-70Bit": "klusterai/Meta-Llama-3.3-70B-Instruct-Turbo",
-    "llama31-405Bit": "klusterai/Meta-Llama-3.1-405B-Instruct-Turbo",
-    "llama31-8Bit": "klusterai/Meta-Llama-3.1-8B-Instruct-Turbo"
+    "llama4-maveric": "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+    "llama4-scout": "meta-llama/Llama-4-Scout-17B-16E-Instruct"
+    # "llama33-70Bit": "klusterai/Meta-Llama-3.3-70B-Instruct-Turbo",
+    # "llama31-405Bit": "klusterai/Meta-Llama-3.1-405B-Instruct-Turbo",
+    # "llama31-8Bit": "klusterai/Meta-Llama-3.1-8B-Instruct-Turbo"
 }
 
 # Experiment parameters
