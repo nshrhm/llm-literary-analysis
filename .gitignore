@@ -54,5 +54,6 @@ Thumbs.db
 results/
 !results/.gitkeep
 
-# Documentation
-docs/
+# Private documentation
+docs/api/private/
+docs/reference/private/

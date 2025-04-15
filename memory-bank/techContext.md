@@ -154,15 +154,30 @@ temperature: [温度値 or None]
 
 ## APIインテグレーション
 
-### OpenAI API
-1. バッチ処理（Ver.1）
-   - エンドポイント: `/v1/chat/completions`
-   - フォーマット: JSONL
-   - コスト削減: 50%
-   - 処理時間: 24時間以内
-   - 制限:
-     - 最大50,000リクエスト/バッチ
-     - ファイルサイズ上限: 200MB
+### OpenAI API（2025-04-15更新）
+1. バッチ処理
+   a. 基本仕様（Ver.1）
+      - エンドポイント: `/v1/chat/completions`
+      - フォーマット: JSONL
+      - コスト削減: 50%
+      - 処理時間: 24時間以内
+      - 制限:
+        - 最大50,000リクエスト/バッチ
+        - ファイルサイズ上限: 200MB
+
+   b. GPT-4.1シリーズの価格設定（2025-04-15）
+      - gpt-4.1:
+        - Input: $2.00
+        - Cached input: $0.50
+        - Output: $8.00
+      - gpt-4.1-mini:
+        - Input: $0.40
+        - Cached input: $0.10
+        - Output: $1.60
+      - gpt-4.1-nano:
+        - Input: $0.10
+        - Cached input: $0.025
+        - Output: $0.40
 
 2. モデル固有の制約
    - o3-mini: 温度パラメータなし

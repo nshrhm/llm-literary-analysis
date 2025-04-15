@@ -45,18 +45,31 @@ Q4. 怒り(理由): [explanation]
 
 ## メタデータ処理
 
-### 温度パラメータの扱い（2025-03-27更新）
-1. 推論モデル（o3-mini、o1-mini）
+### 温度パラメータの扱い（2025-04-15更新）
+1. GPT-4.1シリーズ
+   - temperature: [0.0-1.0] の実数値を記録
+   - ファイル名に温度パラメータを含める
+   - コスト情報を追加（pricing）:
+     ```
+     pricing: {
+       "input": [rate],
+       "cached_input": [rate],
+       "output": [rate]
+     }
+     ```
+
+2. 推論モデル（o3-mini、o1-mini）
    - temperature: None を明示的に記録
    - ファイル名から温度パラメータを省略
 
-2. 生成モデル
+3. 生成モデル
    - temperature: [0.0-1.0] の実数値を記録
    - ファイル名に温度パラメータを含める
 
-### ファイル命名規則
-- 標準形式：`p{persona}_{model}_n{trial}_temp{temp}_{text}.txt`
+### ファイル命名規則（2025-04-15更新）
+- GPT-4.1シリーズ：`p{persona}_gpt-4.1[-(mini|nano)]_n{trial}_temp{temp}_{text}.txt`
 - 推論モデル：`p{persona}_{model}_n{trial}_{text}.txt`
+- その他標準形式：`p{persona}_{model}_n{trial}_temp{temp}_{text}.txt`
 
 ### メタデータの検証
 - タイムスタンプのフォーマット確認

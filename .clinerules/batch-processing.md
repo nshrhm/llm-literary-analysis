@@ -19,13 +19,21 @@
 
 ## 実装ノート
 
-### モデル識別子の処理
+### モデル識別子の処理（2025-04-15更新）
 
 1. モデル識別子フォーマット
 ```python
 def _get_model_identifier(model: str) -> str:
+    # GPT-4.1シリーズ
+    if model_id == "gpt-4.1":
+        return "gpt-4.1"
+    elif model_id == "gpt-4.1-mini":
+        return "gpt-4.1-mini"
+    elif model_id == "gpt-4.1-nano":
+        return "gpt-4.1-nano"
+    
     # DeepSeekモデル
-    if model_id == "deepseekr1":
+    elif model_id == "deepseekr1":
         return "deepseekr1"
     elif model_id == "deepseekv3":
         return "deepseekv3"
@@ -33,7 +41,7 @@ def _get_model_identifier(model: str) -> str:
         return "deepseekv3-0324"
 
     # Llamaモデル
-    if model_id == "llama33-70Bit":
+    elif model_id == "llama33-70Bit":
         return "llama33-70Bit"
     elif model_id == "llama31-405Bit":
         return "llama31-405Bit"
@@ -44,8 +52,16 @@ def _get_model_identifier(model: str) -> str:
 2. 表示名生成
 ```python
 def _get_model_display_name(model: str) -> str:
+    # GPT-4.1シリーズ
+    if model_id == "gpt-4.1":
+        return "GPT-4.1"
+    elif model_id == "gpt-4.1-mini":
+        return "GPT-4.1 Mini"
+    elif model_id == "gpt-4.1-nano":
+        return "GPT-4.1 Nano"
+    
     # DeepSeek表示名
-    if model_id == "deepseekr1":
+    elif model_id == "deepseekr1":
         return "DeepSeek-R1"
     elif model_id == "deepseekv3":
         return "DeepSeek-V3"
@@ -53,12 +69,36 @@ def _get_model_display_name(model: str) -> str:
         return "DeepSeek-V3-0324"
 
     # Llama表示名
-    if model_id == "llama33-70Bit":
+    elif model_id == "llama33-70Bit":
         return "Llama-3.3-70B"
     elif model_id == "llama31-405Bit":
         return "Llama-3.1-405B"
     elif model_id == "llama31-8Bit":
         return "Llama-3.1-8B"
+```
+
+3. 価格情報管理（2025-04-15追加）
+```python
+def get_model_pricing(model: str) -> Dict:
+    if model_id == "gpt-4.1":
+        return {
+            "input": 2.00,
+            "cached_input": 0.50,
+            "output": 8.00
+        }
+    elif model_id == "gpt-4.1-mini":
+        return {
+            "input": 0.40,
+            "cached_input": 0.10,
+            "output": 1.60
+        }
+    elif model_id == "gpt-4.1-nano":
+        return {
+            "input": 0.10,
+            "cached_input": 0.025,
+            "output": 0.40
+        }
+    return None
 ```
 
 ### リクエストフォーマット
