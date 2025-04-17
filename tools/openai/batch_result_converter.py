@@ -2,7 +2,30 @@
 
 import json
 import os
+import re
 from datetime import datetime
+
+def clean_content(content):
+    """Clean and normalize content from API response.
+    
+    Args:
+        content (str): Raw content from API response
+    
+    Returns:
+        str: Cleaned and normalized content
+    """
+    # 空白文字の正規化
+    content = content.strip()
+    content = re.sub(r'\n{3,}', '\n\n', content)
+    
+    # Qセクションの整形
+    for i in range(1, 5):
+        pattern = f"Q{i}"
+        if pattern in content:
+            # Qセクションの前に適切な改行を確保
+            content = re.sub(f'(?<!\\n)({pattern})', r'\n\1', content)
+    
+    return content
 
 def convert_batch_results(input_file):
     """Convert batch results from JSONL to individual text files.
@@ -37,8 +60,9 @@ def convert_batch_results(input_file):
                     text_id = parts[2]
                     trial = parts[3]
                     
-                    # Extract content
+                    # Extract and clean content
                     content = response['body']['choices'][0]['message']['content']
+                    content = clean_content(content)
                     
                     # Save as text file
                     output_file = f"results/openai/{custom_id}.txt"

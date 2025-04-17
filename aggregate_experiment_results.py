@@ -5,8 +5,16 @@ import argparse
 from datetime import datetime
 from pathlib import Path
 
-def extract_q_data(line):
-    """Extract Q value and reason from Q lines"""
+def extract_q_data(text, line_index=None):
+    """Extract Q value and reason from text content.
+    
+    Args:
+        text (str): Full text content or single line
+        line_index (int, optional): Current line index for context
+    
+    Returns:
+        Union[int, str, None]: Extracted value or reason
+    """
     # 数値を抽出するパターン
     patterns = [
         r'Q\d+\.\s*[^(]+\(数値\):\s*(\d+)',          # Q1. 面白さ(数値): 80
@@ -16,33 +24,40 @@ def extract_q_data(line):
         r'Q\d+value:\s*(\d+)'                        # 従来形式も残す
     ]
     
-    # 理由を抽出するパターン
+    # 理由を抽出するパターン（改行を含む可能性を考慮）
     reason_patterns = [
-        r'Q\d+\.\s*[^(]+\(理由\):\s*(.+)',          # Q1. 面白さ(理由): [理由]
-        r'Q\d+\.\s*[^:]+:\s*\(理由\):\s*(.+)',      # Q1. 面白さ: (理由): [理由]
-        r'Q\d+\.\s*[^:]+理由:\s*(.+)',              # Q1. 面白さ 理由: [理由]
-        r'Q\d+reason:\s*(.+)'                       # 従来形式も残す
+        r'Q\d+\.\s*[^(]+\(理由\):\s*(.+?)(?=(?:\n\s*Q\d|$))',  # 次のQまたは終端までマッチ
+        r'Q\d+\.\s*[^:]+:\s*\(理由\):\s*(.+?)(?=(?:\n\s*Q\d|$))',
+        r'Q\d+\.\s*[^:]+理由:\s*(.+?)(?=(?:\n\s*Q\d|$))',
+        r'Q\d+reason:\s*(.+?)(?=(?:\n\s*Q\d|$))'
     ]
     
     # 数値の抽出を試みる
     for pattern in patterns:
-        value_match = re.search(pattern, line)
+        value_match = re.search(pattern, text, re.MULTILINE)
         if value_match:
             return int(value_match.group(1))
     
-    # 理由の抽出を試みる
+    # 理由の抽出を試みる（改行を含む可能性を考慮）
     for pattern in reason_patterns:
-        reason_match = re.search(pattern, line)
+        reason_match = re.search(pattern, text, re.MULTILINE | re.DOTALL)
         if reason_match:
-            return reason_match.group(1).strip()
+            # 余分な改行と空白を削除して正規化
+            reason = reason_match.group(1).strip()
+            reason = re.sub(r'\s+', ' ', reason)
+            return reason
     
     return None
 
 def process_file(filepath):
     """Process a single result file and extract relevant data"""
     try:
+        # ファイル全体を一度に読み込む
         with open(filepath, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
+            content = f.read()
+        
+        # 行ごとの処理用に分割
+        lines = content.splitlines()
         
         data = {
             'timestamp': None,
@@ -61,12 +76,10 @@ def process_file(filepath):
             'Q4reason': None
         }
         
-        current_q = None
-        
+        # メタデータの処理
         for line in lines:
             line = line.strip()
             
-            # メタデータの抽出
             if line.startswith('timestamp:'):
                 data['timestamp'] = line.replace('timestamp:', '').strip()
             elif line.startswith('persona:'):
@@ -85,14 +98,27 @@ def process_file(filepath):
                 data['trial'] = line.replace('trial:', '').strip()
             elif line.startswith('temperature:'):
                 data['temperature'] = line.replace('temperature:', '').strip()
-            elif line.startswith('Q'):
-                # Q1-Q4の数値の抽出
-                for i in range(1, 5):
-                    if line.startswith(f'Q{i}'):
-                        if '数値' in line or 'value' in line.lower():
-                            data[f'Q{i}value'] = extract_q_data(line)
-                        elif '理由' in line or 'reason' in line.lower():
-                            data[f'Q{i}reason'] = extract_q_data(line)
+        
+        # Q1-Q4の数値と理由の抽出（ファイル全体から）
+        for i in range(1, 5):
+            # 数値の抽出（行単位）
+            for line in lines:
+                if line.startswith(f'Q{i}') and ('数値' in line or 'value' in line.lower()):
+                    data[f'Q{i}value'] = extract_q_data(line)
+                    break
+            
+            # 理由の抽出（複数行対応）
+            for pattern in [
+                f'Q{i}\\.[^(]+\\(理由\\):[^\\n]*(?:\\n(?!Q\\d)[^\\n]*)*',  # 標準形式
+                f'Q{i}\\.[^:]+:\\s*\\(理由\\):[^\\n]*(?:\\n(?!Q\\d)[^\\n]*)*',  # 代替形式1
+                f'Q{i}\\.[^:]+理由:[^\\n]*(?:\\n(?!Q\\d)[^\\n]*)*',  # 代替形式2
+                f'Q{i}reason:[^\\n]*(?:\\n(?!Q\\d)[^\\n]*)*'  # 従来形式
+            ]:
+                match = re.search(pattern, content, re.MULTILINE | re.DOTALL)
+                if match:
+                    reason_text = match.group(0)
+                    data[f'Q{i}reason'] = extract_q_data(reason_text)
+                    break
         
         return data
     except Exception as e:

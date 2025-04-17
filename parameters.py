@@ -123,29 +123,99 @@ TEXTS = {
 
 # OpenAI model definitions
 OPENAI_MODELS = {
+    "gpt-4.1": {
+        "model_name": "gpt-4.1",
+        "type": "text_generation",
+        "pricing": {
+            "input": 2.00,
+            "cached_input": 0.50,
+            "output": 8.00
+            },
+        "endpoint": "https://api.openai.com/v1/engines/gpt-4.1/completions"
+    },
+    "gpt-4.1-mini": {
+        "model_name": "gpt-4.1-mini",
+        "type": "text_generation",
+        "pricing": {
+            "input": 0.40,
+            "cached_input": 0.10,
+            "output": 1.60
+        },
+        "endpoint": "https://api.openai.com/v1/engines/gpt-4.1-mini/completions"
+    },
+    "gpt-4.1-nano": {
+        "model_name": "gpt-4.1-nano",
+        "type": "text_generation",
+        "pricing": {
+            "input": 0.10,
+            "cached_input": 0.025,
+            "output": 0.40
+        },
+        "endpoint": "https://api.openai.com/v1/engines/gpt-4.1-nano/completions"
+    },
     "gpt-4o": {
-         "model_name": "gpt-4o",
-         "type": "text_generation",
-         "endpoint": "https://api.openai.com/v1/engines/gpt-4o/completions"
+        "model_name": "gpt-4o",
+        "type": "text_generation",
+        "pricing": {
+            "input": 2.50,
+            "cached_input": 1.25,
+            "output": 10.00
+        },
+        "endpoint": "https://api.openai.com/v1/engines/gpt-4o/completions"
     },
     "gpt-4o-mini": {
-         "model_name": "gpt-4o-mini",
-         "type": "text_generation",
-         "endpoint": "https://api.openai.com/v1/engines/gpt-4o-mini/completions"
+        "model_name": "gpt-4o-mini",
+        "type": "text_generation",
+        "pricing": {
+            "input": 0.15,
+            "cached_input": 0.075,
+            "output": 0.60
+        },
+        "endpoint": "https://api.openai.com/v1/engines/gpt-4o-mini/completions"
+    },
+    "o4-mini": {
+        "model_name": "o4-mini",
+        "type": "reasoning",
+        "temperature_support": False,  # このモデルはtemperatureパラメータをサポートしない
+        "pricing": {
+            "input": 1.10,
+            "cached_input": 0.275,
+            "output": 4.40
+        },
+        "endpoint": "https://api.openai.com/v1/engines/o4-mini/completions"
+    },
+    "o3": {
+        "model_name": "o3",
+        "type": "reasoning",
+        "temperature_support": False,  # このモデルはtemperatureパラメータをサポートしない
+        "pricing": {
+            "input": 10,
+            "cached_input": 2.5,
+            "output": 40
+        },
+        "endpoint": "https://api.openai.com/v1/engines/o3/completions"
     },
     "o3-mini": {
-         "model_name": "o3-mini",
-         "type": "reasoning",
-         "config_type": "reasoning",  # 設定タイプを明示的に指定
-         "temperature_support": False,  # このモデルはtemperatureパラメータをサポートしない
-         "endpoint": "https://api.openai.com/v1/engines/o3-mini/completions"
+        "model_name": "o3-mini",
+        "type": "reasoning",
+        "temperature_support": False,  # このモデルはtemperatureパラメータをサポートしない
+        "pricing": {
+            "input": 1.10,
+            "cached_input": 0.55,
+            "output": 4.40
+        },
+        "endpoint": "https://api.openai.com/v1/engines/o3-mini/completions"
     },
     "o1-mini": {
-         "model_name": "o1-mini",
-         "type": "reasoning",
-         "config_type": "reasoning",  # 設定タイプを明示的に指定
-         "temperature_support": False,
-         "endpoint": "https://api.openai.com/v1/engines/o1-mini/completions"
+        "model_name": "o1-mini",
+        "type": "reasoning",
+        "temperature_support": False,  # このモデルはtemperatureパラメータをサポートしない
+        "pricing": {
+            "input": 1.10,
+            "cached_input": 0.55,
+            "output": 4.40
+        },
+        "endpoint": "https://api.openai.com/v1/engines/o1-mini/completions"
     }
 }
 
@@ -199,8 +269,8 @@ DEEPSEEK_MODELS = {
 # Llama model definitions
 LLAMA_MODELS = {
     "llama4-maveric": "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
-    "llama4-scout": "meta-llama/Llama-4-Scout-17B-16E-Instruct"
-    # "llama33-70Bit": "klusterai/Meta-Llama-3.3-70B-Instruct-Turbo",
+    "llama4-scout": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+    "llama33-70Bit": "klusterai/Meta-Llama-3.3-70B-Instruct-Turbo",
     # "llama31-405Bit": "klusterai/Meta-Llama-3.1-405B-Instruct-Turbo",
     # "llama31-8Bit": "klusterai/Meta-Llama-3.1-8B-Instruct-Turbo"
 }
@@ -212,12 +282,12 @@ TRIALS = 10  # 試行回数を10回に設定
 # Currently not used in the codebase as of 2025-03
 # Planned usage: Provider-agnostic model configuration
 MODEL_TYPES = {
-    "grok": GROK_MODELS,
-    "gemini": GEMINI_MODELS,
-    "claude": CLAUDE_MODELS, 
-    "deepseek": DEEPSEEK_MODELS,
-    "llama": LLAMA_MODELS
-    # "openai": OPENAI_MODELS  # Temporarily excluded due to different structure
+  "openai": OPENAI_MODELS,
+  "claude": CLAUDE_MODELS,
+  "gemini": GEMINI_MODELS,
+  "grok": GROK_MODELS,
+  "deepseek": DEEPSEEK_MODELS,
+  "llama": LLAMA_MODELS
 }
 
 # Text content definitions

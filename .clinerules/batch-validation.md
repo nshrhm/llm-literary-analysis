@@ -32,6 +32,11 @@ model: [Model name]
 trial: [Trial number]
 temperature: [Temperature value]
 text: [Text name]
+pricing: {  # 2025-04-17追加：GPT-4.1シリーズ用
+  "input": [rate],
+  "cached_input": [rate],
+  "output": [rate]
+}
 Q1value: [0-100]
 Q1reason: [Explanation]
 Q2value: [0-100]
@@ -50,10 +55,18 @@ Validation Points:
 
 ### 3. Model-Specific Validation
 
-#### OpenAI (48 results)
-- Standard models: All fields present
-- o3-mini: No temperature field
-- o1-mini: Combined system-user content
+#### OpenAI (408 results)（2025-04-17更新）
+1. GPT-4.1シリーズ（360結果）：
+   - 3モデル × 4ペルソナ × 3テキスト × 10トライアル
+   - 価格情報の検証（input/cached_input/output rates）
+   - バッチ処理のコスト削減効果（50%）
+   - パターンマッチング成功率
+   - エラー回復効率
+
+2. 従来モデル（48結果）：
+   - Standard models: All fields present
+   - o3-mini: No temperature field
+   - o1-mini: Combined system-user content
 
 #### Claude (60 results)
 - Content array format
@@ -100,6 +113,9 @@ def process_file(filepath):
         # Field extraction and validation
         # Format verification
         # Value range checking
+        # 2025-04-17追加：価格情報の検証
+        if "pricing" in data:
+            validate_pricing_info(data["pricing"])
         return data
 ```
 
@@ -110,16 +126,19 @@ def generate_csv(results, output_file):
     headers = [
         'timestamp', 'persona', 'model', 'trial',
         'temperature', 'text',
+        'pricing_input', 'pricing_cached_input', 'pricing_output',  # 2025-04-17追加
         'Q1value', 'Q2value', 'Q3value', 'Q4value',
         'Q1reason', 'Q2reason', 'Q3reason', 'Q4reason'
     ]
     # Write CSV with validation checks
 ```
 
-## Validation Results (2025-03-23)
+## Validation Results (2025-04-17更新)
 
 ### 1. File Processing
-- OpenAI: 48/48 (100% success)
+- OpenAI: 408/408 (100% success)
+  - GPT-4.1シリーズ: 360/360 (100% success)
+  - 従来モデル: 48/48 (100% success)
 - Claude: 60/60 (100% success)
 - Gemini: 83/83 (100% success)
 - Grok: 12/12 (100% success)
@@ -131,6 +150,7 @@ def generate_csv(results, output_file):
 - Q-values: All within 0-100 range
 - Reasons: All properly formatted
 - Unicode: No encoding issues
+- Pricing: 100% valid（GPT-4.1シリーズ）
 
 ### 3. Output Files
 ```
@@ -156,6 +176,7 @@ aggregated_results/
 - Invalid values
 - Format inconsistencies
 - Unicode problems
+- Pricing validation errors（2025-04-17追加）
 
 ### 3. Processing Errors
 - CSV writing failures
@@ -170,18 +191,21 @@ aggregated_results/
    - Validate permissions
    - Verify encoding
    - Check structure
+   - Verify pricing format（2025-04-17追加）
 
 2. Processing
    - Validate all fields
    - Check value ranges
    - Verify formats
    - Handle errors gracefully
+   - Process pricing data（2025-04-17追加）
 
 3. Post-processing
    - Verify CSV output
    - Check result counts
    - Validate aggregations
    - Document issues
+   - Confirm cost calculations（2025-04-17追加）
 
 ## Monitoring
 
@@ -190,15 +214,18 @@ aggregated_results/
    - Success rate
    - Error rate
    - Processing time
+   - Cost efficiency（2025-04-17追加）
 
 2. Data Quality
    - Field completeness
    - Value distributions
    - Format consistency
    - Error patterns
+   - Pricing accuracy（2025-04-17追加）
 
 3. System Performance
    - Memory usage
    - Processing speed
    - File I/O
    - Error handling
+   - Batch optimization（2025-04-17追加）
