@@ -82,10 +82,17 @@ Validation Points:
   - キャッシュヒット率
   - コスト削減効果
 
-#### Gemini (83 results)
-- GenerationConfig usage
-- Temperature parameter
-- Response format
+#### Gemini (123 results)（2025-04-19更新）
+1. モデル別結果数：
+   - 既存モデル：83結果
+   - Gemini 2.5 Flash Preview：40結果（1モデル × 4ペルソナ × 1テキスト × 10トライアル）
+
+2. 検証項目：
+   - GenerationConfig usage
+   - Temperature parameter
+   - Response format
+   - バッチ処理の安定性
+   - 応答形式の一貫性
 
 #### Grok (12 results)
 - X.AI API format
@@ -133,14 +140,16 @@ def generate_csv(results, output_file):
     # Write CSV with validation checks
 ```
 
-## Validation Results (2025-04-17更新)
+## Validation Results (2025-04-19更新)
 
 ### 1. File Processing
 - OpenAI: 408/408 (100% success)
   - GPT-4.1シリーズ: 360/360 (100% success)
   - 従来モデル: 48/48 (100% success)
 - Claude: 60/60 (100% success)
-- Gemini: 83/83 (100% success)
+- Gemini: 123/123 (100% success)
+  - 既存モデル: 83/83 (100% success)
+  - Gemini 2.5: 40/40 (100% success)
 - Grok: 12/12 (100% success)
 - DeepSeek: 24/24 (100% success)
 - Llama: 36/36 (100% success)

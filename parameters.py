@@ -235,17 +235,18 @@ CLAUDE_MODELS = {
 
 GEMINI_MODELS = {
     # Gemini 2.5/2.0シリーズ
-    "gemini25p": "gemini-2.5-pro-preview-03-25",
-    "gemini20f": "gemini-2.0-flash",
-    "gemini20fl": "gemini-2.0-flash-lite",
-    "gemini20p": "gemini-2.0-pro-exp",
-    "gemini20t": "gemini-2.0-flash-thinking-exp",
+    "gemini25p"  : "gemini-2.5-pro-preview-03-25",
+    "gemini25f"  : "gemini-2.5-flash-preview-04-17",
+    "gemini20f"  : "gemini-2.0-flash",
+    "gemini20fl" : "gemini-2.0-flash-lite",
+    "gemini20p"  : "gemini-2.0-pro-exp",
+    "gemini20t"  : "gemini-2.0-flash-thinking-exp",
     
     # Gemma シリーズ
-    "gemma1b": "gemma-3-1b-it",
-    "gemma4b": "gemma-3-4b-it",
-    "gemma12b": "gemma-3-12b-it",
-    "gemma27b": "gemma-3-27b-it"
+    "gemma1b"    : "gemma-3-1b-it",
+    "gemma4b"    : "gemma-3-4b-it",
+    "gemma12b"   : "gemma-3-12b-it",
+    "gemma27b"   : "gemma-3-27b-it"
 }
 
 GROK_MODELS = {

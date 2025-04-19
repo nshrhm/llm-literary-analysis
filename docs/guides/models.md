@@ -2,10 +2,25 @@
 
 ## サポート対象モデル
 
-### Google Gemini
-- Gemini 2.0: Pro Exp, Flash Thinking Exp, Flash
-- Gemini 1.5: Pro, Flash
-- Gemma 3.0: 27B IT
+### Google Gemini（2025-04-19更新）
+1. Gemini 2.5シリーズ：
+   - Pro Preview（2.5）
+   - Flash Preview（2.5）：新規追加（2025-04-19）
+     - 高速処理に最適化
+     - バッチ処理の安定性向上
+     - 標準フォーマットへの完全準拠
+
+2. Gemini 2.0シリーズ：
+   - Pro Exp
+   - Flash Thinking Exp
+   - Flash
+   - Flash Lite
+
+3. Gemmaシリーズ：
+   - 27B IT
+   - 12B IT
+   - 4B IT
+   - 1B IT
 
 ### Anthropic Claude
 - Claude 3.7: Sonnet
@@ -61,6 +76,17 @@
 - claude-3-sonnet-20240229はバッチ処理非対応
 - Message Batches APIで最大100,000リクエストまで対応
 - スロットリング：100リクエスト/分
+
+### Gemini（2025-04-19更新）
+1. Gemini 2.5 Flash Preview
+   - バッチ処理の最適化
+   - 高速な応答生成
+   - 効率的なリソース使用
+
+2. 共通の制約
+   - レート制限の考慮
+   - メモリ使用量の最適化
+   - 並列処理の制御
 
 ### DeepSeek & Llama
 - OpenAI互換APIインターフェース

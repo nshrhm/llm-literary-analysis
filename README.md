@@ -11,9 +11,11 @@
 - バッチ処理による効率的な実験実行
 - 詳細な結果分析と可視化
 
-## サポート対象モデル
+## サポート対象モデル（2025-04-19更新）
 
-- Google Gemini（2.0/1.5シリーズ）
+- Google Gemini（2.5/2.0シリーズ）
+  - 最新：Gemini 2.5 Flash Preview（2025-04-19追加）
+  - その他：Pro、Flash、Flash Thinking
 - Anthropic Claude（3.7/3.5/3.0シリーズ）
 - X.AI Grok（2.0シリーズ）
 - OpenAI（GPT-4.1/GPT-4シリーズ）
