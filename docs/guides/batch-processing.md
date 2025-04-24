@@ -56,7 +56,7 @@ python tools/openai/batch_result_converter.py results/openai/batch_results/<batc
 
 #### 使用方法
 ```bash
-python claude_batch_runner.py --input <input_file> --output <output_dir>
+python claude_example.py --batch [--model claude37s claude35s]
 ```
 
 ### kluster.ai

@@ -1,5 +1,74 @@
 # モデルガイド
 
+## モデル選択ガイド（2025-04-24追加）
+
+各モデルの実行時には、短縮名（モデルID）を使用してモデルを指定します。以下に各モデルのIDと正式名称の対応を示します。
+
+### Google Geminiモデル
+| モデルID | 正式名称 | 説明 |
+|----------|----------|------|
+| gemini25p | gemini-2.5-pro-preview-03-25 | Pro Preview 2.5 |
+| gemini25f | gemini-2.5-flash-preview-04-17 | Flash Preview 2.5 |
+| gemini20f | gemini-2.0-flash | Flash 2.0 |
+| gemini20fl | gemini-2.0-flash-lite | Flash Lite 2.0 |
+| gemini20p | gemini-2.0-pro-exp | Pro Exp 2.0 |
+| gemini20t | gemini-2.0-flash-thinking-exp | Flash Thinking 2.0 |
+
+### Anthropic Claudeモデル
+| モデルID | 正式名称 | 説明 |
+|----------|----------|------|
+| claude37s | claude-3-7-sonnet-20250219 | Sonnet 3.7 |
+| claude35s | claude-3-5-sonnet-20241022 | Sonnet 3.5 |
+| claude35h | claude-3-5-haiku-20241022 | Haiku 3.5 |
+| claude30h | claude-3-haiku-20240307 | Haiku 3.0 |
+
+### X.AI Grokモデル
+| モデルID | 正式名称 | 説明 |
+|----------|----------|------|
+| grok20l | grok-2-latest | Grok 2シリーズ最新版 |
+| grok3mf | grok-3-mini-fast-latest | Grok 3 Mini Fast |
+| grok3m | grok-3-mini-latest | Grok 3 Mini |
+| grok3f | grok-3-fast-latest | Grok 3 Fast |
+| grok3 | grok-3-latest | Grok 3標準 |
+
+### DeepSeekモデル
+| モデルID | 正式名称 | 説明 |
+|----------|----------|------|
+| deepseekr1 | deepseek-ai/DeepSeek-R1 | R1シリーズ |
+| deepseekv3 | deepseek-ai/DeepSeek-V3 | V3シリーズ |
+| deepseekv3-0324 | deepseek-ai/DeepSeek-V3-0324 | V3シリーズ（0324更新版） |
+
+### Meta Llamaモデル
+| モデルID | 正式名称 | 説明 |
+|----------|----------|------|
+| llama4-maveric | meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8 | Maverick 17B |
+| llama4-scout | meta-llama/Llama-4-Scout-17B-16E-Instruct | Scout 17B |
+| llama33-70Bit | klusterai/Meta-Llama-3.3-70B-Instruct-Turbo | 70B Instruct Turbo |
+
+## 使用例
+複数のモデルを選択して実行する場合：
+```bash
+# Geminiモデルの場合
+python gemini_example.py --model gemini25p gemini25f
+
+# Claudeモデルの場合
+python claude_example.py --model claude37s claude35s
+
+# Grokモデルの場合
+python grok_example.py --model grok20l grok3mf
+
+# DeepSeekモデルの場合
+python deepseek_example.py --model deepseekr1 deepseekv3
+
+# Llamaモデルの場合
+python llama_example.py --model llama4-maveric llama4-scout
+```
+
+バッチ処理と組み合わせる場合：
+```bash
+python claude_example.py --batch --model claude37s claude35s
+```
+
 ## サポート対象モデル
 
 ### Google Gemini（2025-04-19更新）
