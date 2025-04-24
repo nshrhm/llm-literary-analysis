@@ -72,6 +72,22 @@ python check_models.py
 
 ## 使用方法
 
+### バッチ処理実行
+各バッチ処理の実装と実行例:
+```bash
+# OpenAIバッチ処理
+python openai_example.py --batch [--model gpt-4.1 gpt-4.1-mini]
+
+# Claudeバッチ処理
+python claude_example.py --batch [--model claude37s claude35s]
+
+# DeepSeekバッチ処理
+python deepseek_batch_example.py
+
+# Llamaバッチ処理
+python llama_batch_example.py
+```
+
 ### モデル選択実行（2025-04-24追加）
 各モデルのexampleスクリプトで特定のモデルを選択実行できます：
 ```bash
@@ -93,6 +109,9 @@ python deepseek_example.py --model deepseek-r1 deepseek-v3
 # Llamaモデルの選択実行
 python llama_example.py --model llama70b llama405b
 ```
+
+### モデルIDと正式名称の対応
+モデル選択実行に使用する短縮モデルIDと対応する正式モデル名については、詳細は[モデルガイド](docs/guides/models.md#モデル選択ガイド)を参照してください。
 
 ### 基本的な使用方法
 - [機能ガイド](docs/guides/features.md)
