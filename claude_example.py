@@ -43,6 +43,9 @@ def main():
     parser.add_argument("--batch", action="store_true", help="Use batch processing")
     parser.add_argument("--status", help="Check status of batch job")
     parser.add_argument("--cancel", help="Cancel batch job")
+    parser.add_argument("--model", nargs="+", 
+                       choices=list(CLAUDE_MODELS.keys()),
+                       help="Specify one or more models to run")
     args = parser.parse_args()
     
     try:
@@ -56,16 +59,23 @@ def main():
         elif args.cancel:
             cancel_batch(args.cancel)
         else:
-            # Create and run Claude experiment
-            print(f"Starting Claude experiment with {len(CLAUDE_MODELS)} models...")
+            # Select models to run
+            if args.model:
+                # 複数モデルの実行
+                models = {model: CLAUDE_MODELS[model] for model in args.model}
+                print(f"Starting Claude experiment with models: {', '.join(args.model)}")
+            else:
+                # 全モデルの実行
+                models = CLAUDE_MODELS
+                print(f"Starting Claude experiment with {len(CLAUDE_MODELS)} models...")
             
             if args.batch:
                 print("Using batch processing (50% cost reduction enabled)...")
                 runner = ClaudeBatchRunner()
-                runner.run_batch_experiment()
+                runner.run_batch_experiment(models)
             else:
                 runner = ClaudeExperimentRunner()
-                runner.run_experiment()
+                runner.run_experiment(models)
                 
             print("Claude experiment completed successfully!")
             
