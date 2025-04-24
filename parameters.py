@@ -126,6 +126,7 @@ OPENAI_MODELS = {
     "gpt-4.1": {
         "model_name": "gpt-4.1",
         "type": "text_generation",
+        "temperature_support": True,  # text_generation型のためtemperature設定を有効化
         "pricing": {
             "input": 2.00,
             "cached_input": 0.50,
@@ -136,6 +137,7 @@ OPENAI_MODELS = {
     "gpt-4.1-mini": {
         "model_name": "gpt-4.1-mini",
         "type": "text_generation",
+        "temperature_support": True,  # text_generation型のためtemperature設定を有効化
         "pricing": {
             "input": 0.40,
             "cached_input": 0.10,
@@ -146,6 +148,7 @@ OPENAI_MODELS = {
     "gpt-4.1-nano": {
         "model_name": "gpt-4.1-nano",
         "type": "text_generation",
+        "temperature_support": True,  # text_generation型のためtemperature設定を有効化
         "pricing": {
             "input": 0.10,
             "cached_input": 0.025,

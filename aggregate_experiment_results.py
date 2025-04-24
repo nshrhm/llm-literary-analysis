@@ -149,7 +149,7 @@ def main():
     output_file = output_path / generate_output_filename(args.input_dir)
     
     # CSVヘッダーの設定
-    headers = ['timestamp', 'persona', 'model', 'trial', 'temperature', 'text',
+    headers = ['timestamp', 'text', 'model', 'persona', 'temperature', 'trial', 
               'Q1value', 'Q2value', 'Q3value', 'Q4value',
               'Q1reason', 'Q2reason', 'Q3reason', 'Q4reason']
     

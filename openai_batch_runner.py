@@ -93,10 +93,14 @@ class OpenAIBatchRunner:
                     if response["status_code"] == 200:
                         # Parse custom_id
                         parts = custom_id.split("_")
-                        persona_id = parts[0]
+                        text_id = parts[0]
                         model_id = parts[1]
-                        text_id = parts[2]
-                        trial = parts[3]
+                        persona_id = parts[2]
+                        # Check if temperature is included
+                        if "temp" in parts[3]:
+                            trial = parts[4]
+                        else:
+                            trial = parts[3]
                         
                         # Extract content
                         content = response["body"]["choices"][0]["message"]["content"]
@@ -147,42 +151,47 @@ class OpenAIBatchRunner:
         # Debug print to check model config
         print(f"\nCreating batch for model: {model_id}")
         print(f"Model config: {model_config}")
-        print(f"Temperature support: {model_config.get('temperature_support', True)}")
+        
+        # text_generation型の場合はデフォルトでtemperature_supportをTrue、そうでない場合はFalse
+        temperature_support = model_config.get("temperature_support", model_config.get("type") == "text_generation")
+        print(f"Temperature support: {temperature_support}")
         
         # Create input file for this model
         input_file = f"results/openai/batch_inputs/batch_requests_{model_id}_{timestamp}.jsonl"
         
         with open(input_file, "w", encoding="utf-8") as f:
-                    for persona_id, persona_info in PERSONAS.items():
-                        for text_id, text_info in TEXTS.items():
-                            for trial in range(1, TRIALS + 1):
-                                text_content = TEXT_CONTENT[text_id]
-                                
-                                # PromptManagerでプロンプトを生成（温度制御も含む）
-                                prompt = PromptManager.get_prompt("openai", persona_id, text_content, text_id, model_id)
-                                
-                                # カスタムIDを生成 (試行番号を2桁でフォーマット)
-                                trial_num = f"n{trial:02d}"
-                                custom_id = f"{persona_id}_{model_id}_{text_id}_{trial_num}"
-                                
-                                # temperature_supportがTrueの場合のみtemp値を追加
-                                if model_config.get("temperature_support", False):
-                                    temp_value = prompt.get("temperature", 0.5)  # デフォルト値0.5
-                                    custom_id += f"_temp{int(temp_value*100)}"
-                                
-                                # リクエストの作成
-                                request = {
-                                    "custom_id": custom_id,
-                                    "method": "POST",
-                                    "url": "/v1/chat/completions",
-                                    "body": {
-                                        "model": model_config["model_name"],
-                                        **prompt
-                                    }
-                                }
-                                
-                                json.dump(request, f, ensure_ascii=False)
-                                f.write("\n")
+            for persona_id, persona_info in PERSONAS.items():
+                for text_id, text_info in TEXTS.items():
+                    for trial in range(1, TRIALS + 1):
+                        text_content = TEXT_CONTENT[text_id]
+                        
+                        # PromptManagerでプロンプトを生成（温度制御も含む）
+                        prompt = PromptManager.get_prompt("openai", persona_id, text_content, text_id, model_id)
+                        
+                        # カスタムIDを生成 (試行番号を2桁でフォーマット)
+                        trial_num = f"n{trial:02d}"
+                        custom_id = f"{text_id}_{model_id}_{persona_id}_{trial_num}"
+                        
+                        # temperature_supportがTrueの場合のみtemp値を追加
+                        if temperature_support:
+                            temp_value = prompt.get("temperature", 0.5)  # デフォルト値0.5
+                            custom_id = f"{text_id}_{model_id}_{persona_id}_temp{int(temp_value*100)}_{trial_num}"
+                        else:
+                            custom_id = f"{text_id}_{model_id}_{persona_id}_temp--_{trial_num}"
+                        
+                        # リクエストの作成
+                        request = {
+                            "custom_id": custom_id,
+                            "method": "POST",
+                            "url": "/v1/chat/completions",
+                            "body": {
+                                "model": model_config["model_name"],
+                                **prompt
+                            }
+                        }
+                        
+                        json.dump(request, f, ensure_ascii=False)
+                        f.write("\n")
         
         return input_file
 

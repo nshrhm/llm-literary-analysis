@@ -140,7 +140,7 @@ class KlusterBatchRunner:
             temperature = base_temp + temp_modifier
 
             # Generate custom ID with model identifier
-            custom_id = f"{persona_id}_{model_identifier}_{text_id}_{trial_num}_temp{int(temperature*100)}"
+            custom_id = f"{text_id}_{model_identifier}_{persona_id}_temp{int(temperature*100)}_{trial_num.replace('n', '')}"
 
             # Get text content
             text_content = TEXT_CONTENT[text_id]
@@ -317,11 +317,11 @@ class KlusterBatchRunner:
                 with open(txt_path, "w", encoding="utf-8") as f:
                     # Write metadata
                     f.write(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-                    f.write(f"persona: {custom_id.split('_')[0]}\n")
+                    f.write(f"persona: {custom_id.split('_')[2]}\n")
                     f.write(f"model: {model_display_name}\n")  # Use display name
-                    f.write(f"trial: {custom_id.split('_')[3]}\n")
-                    f.write(f"temperature: {float(custom_id.split('_')[4].replace('temp',''))/100}\n")
-                    f.write(f"text: {custom_id.split('_')[2]}\n\n")
+                    f.write(f"trial: {custom_id.split('_')[4]}\n")
+                    f.write(f"temperature: {float(custom_id.split('_')[3].replace('temp',''))/100}\n")
+                    f.write(f"text: {custom_id.split('_')[0]}\n\n")
                     # Write evaluation results
                     f.write(response)
                 

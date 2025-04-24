@@ -87,9 +87,9 @@ class BaseExperimentRunner:
         # Generate filename based on whether temperature should be included
         if params.get('use_temperature', True):
             temp_value = params.get('temperature', 0.5)  # デフォルト値として0.5を使用
-            filename = f"{params['persona_key']}_{params['model_key']}_n{params['trial']:02d}_temp{int(temp_value*100):02d}_{params['text_key']}.txt"
+            filename = f"{params['text_key']}_{params['model_key']}_{params['persona_key']}_temp{int(temp_value*100):02d}_{params['trial']:02d}.txt"
         else:
-            filename = f"{params['persona_key']}_{params['model_key']}_n{params['trial']:02d}_{params['text_key']}.txt"
+            filename = f"{params['text_key']}_{params['model_key']}_{params['persona_key']}_temp--_{params['trial']:02d}.txt"
         
         filepath = os.path.join(self.results_dir, filename)
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -220,7 +220,7 @@ class GeminiExperimentRunner(BaseExperimentRunner):
                             self.save_result(full_response, params)
                             # Progress message based on whether temperature is used
                             if params.get('use_temperature', True):
-                                print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(params['temperature']*100):02d}_{params['text_key']}")
+                                print(f"Completed: {params['text_key']}_{params['model_key']}_{params['persona_key']}_temp{int(params['temperature']*100):02d}_{trial:02d}")
                             else:
                                 print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_{params['text_key']}")
                             
@@ -284,7 +284,7 @@ class GrokExperimentRunner(BaseExperimentRunner):
                             }
                             
                             self.save_result(response.choices[0].message.content, params)
-                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(params['temperature']*100):02d}_{params['text_key']}")
+                            print(f"Completed: {params['text_key']}_{params['model_key']}_{params['persona_key']}_temp{int(params['temperature']*100):02d}_{trial:02d}")
                             
                         except Exception as e:
                             print(f"Error in trial {trial} with {model_name}: {str(e)}")
@@ -342,7 +342,7 @@ class ClaudeExperimentRunner(BaseExperimentRunner):
                             }
                             
                             self.save_result(response.content[0].text, params)
-                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(params['temperature']*100):02d}_{params['text_key']}")
+                            print(f"Completed: {params['text_key']}_{params['model_key']}_{params['persona_key']}_temp{int(params['temperature']*100):02d}_{trial:02d}")
                             
                         except Exception as e:
                             print(f"Error in trial {trial} with {model_name}: {str(e)}")
@@ -431,7 +431,7 @@ class DeepSeekExperimentRunner(BaseExperimentRunner):
                             }
                             
                             self.save_result(response.choices[0].message.content, params)
-                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(params['temperature']*100):02d}_{params['text_key']}")
+                            print(f"Completed: {params['text_key']}_{params['model_key']}_{params['persona_key']}_temp{int(params['temperature']*100):02d}_{trial:02d}")
                             
                         except Exception as e:
                             print(f"Error in trial {trial} with {model_name}: {str(e)}")
@@ -503,9 +503,9 @@ class OpenAIExperimentRunner(BaseExperimentRunner):
                             self.save_result(response.choices[0].message.content, params)
                             # Progress message based on whether temperature is used
                             if params.get('use_temperature', True):
-                                print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(params['temperature']*100):02d}_{params['text_key']}")
+                                print(f"Completed: {params['text_key']}_{params['model_key']}_{params['persona_key']}_temp{int(params['temperature']*100):02d}_{trial:02d}")
                             else:
-                                print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_{params['text_key']}")
+                                print(f"Completed: {params['text_key']}_{params['model_key']}_{params['persona_key']}_temp--_{trial:02d}")
                             
                         except Exception as e:
                             print(f"Error in trial {trial} with {model_name}: {str(e)}")
@@ -566,7 +566,7 @@ class LlamaExperimentRunner(BaseExperimentRunner):
                             }
                             
                             self.save_result(response.choices[0].message.content, params)
-                            print(f"Completed: {params['persona_key']}_{params['model_key']}_n{trial:02d}_temp{int(params['temperature']*100):02d}_{params['text_key']}")
+                            print(f"Completed: {params['text_key']}_{params['model_key']}_{params['persona_key']}_temp{int(params['temperature']*100):02d}_{trial:02d}")
                             
                         except Exception as e:
                             print(f"Error in trial {trial} with {model_name}: {str(e)}")

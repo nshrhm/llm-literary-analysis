@@ -36,7 +36,7 @@ class ClaudeBatchRunner:
                 temp_value = prompt.get("temperature", 0.5)
                 
                 # カスタムIDを生成
-                custom_id = f"{persona_id}_{model_id}_{text_id}_n01_temp{int(temp_value*100)}"
+                custom_id = f"{text_id}_{model_id}_{persona_id}_temp{int(temp_value*100)}_01"
                 
                 # Create request
                 request = Request(
@@ -90,12 +90,12 @@ class ClaudeBatchRunner:
                     
                     match result.result.type:
                         case "succeeded":
-                            # Parse custom_id: persona_model_text_trial
+                            # Parse custom_id: text_model_persona_temp{value}_trial
                             parts = custom_id.split("_")
-                            persona_id = parts[0]
+                            text_id = parts[0]
                             model_id = parts[1]
-                            text_id = parts[2]
-                            trial = parts[3]
+                            persona_id = parts[2]
+                            trial = parts[4]
                             
                             # Extract content
                             message = result.result.message
