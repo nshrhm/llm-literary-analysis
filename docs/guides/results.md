@@ -6,28 +6,28 @@
 ```
 results/
 ├── gemini/
-│   └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
+│   └── {text}_{model}_{persona}_temp{temp}_{trial}.txt
 ├── claude/
-│   └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
+│   └── {text}_{model}_{persona}_temp{temp}_{trial}.txt
 ├── grok/
-│   └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
+│   └── {text}_{model}_{persona}_temp{temp}_{trial}.txt
 ├── openai/
 │   ├── batch_results/
 │   │   └── batch_{id}_output.jsonl  # バッチ処理の生結果
-│   └── p{persona}_{model}_n{trial}[_temp{temp}]_{text}.txt
+│   └── {text}_{model}_{persona}_temp{temp}_{trial}.txt
 ├── deepseek/
-│   └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
+│   └── {text}_{model}_{persona}_temp{temp}_{trial}.txt
 └── llama/
-    └── p{persona}_{model}_n{trial}_temp{temp}_{text}.txt
+    └── {text}_{model}_{persona}_temp{temp}_{trial}.txt
 ```
 
-### ファイル命名規則（2025-04-17更新）
-- GPT-4.1シリーズ：`p{persona}_gpt-4.1[-(mini|nano)]_n{trial}_temp{temp}_{text}.txt`
-  例：`p1_gpt-4.1_n01_temp70_t1.txt`
-- 標準形式：`p{persona}_{model}_n{trial}_temp{temp}_{text}.txt`
-  例：`p1_gemini20pe_n01_temp70_t1.txt`
-- 推論モデル：`p{persona}_{model}_n{trial}_{text}.txt`
-  例：`p1_o3-mini_n01_t1.txt`
+### ファイル命名規則（2025-04-24更新）
+- GPT-4.1シリーズ：`{text}_gpt-4.1[-(mini|nano)]_{persona}_temp{temp}_{trial}.txt`
+  例：`t1_gpt-4.1_p1_temp70_01.txt`
+- 標準形式：`{text}_{model}_{persona}_temp{temp}_{trial}.txt`
+  例：`t1_gemini20pe_p1_temp70_01.txt`
+- 推論モデル：`{text}_{model}_{persona}_temp--_{trial}.txt`
+  例：`t1_o3-mini_p1_temp--_01.txt`
 - バッチ結果：`batch_{id}_output.jsonl`
 
 ## 結果ファイルフォーマット
@@ -158,7 +158,7 @@ aggregated_results/
 1. 基本フィールド
    - タイムスタンプ形式
    - ペルソナID（p1-p4）
-   - 試行番号（n01-n10）
+   - 試行番号（01-10）
    - テキストID（t1-t3）
 
 2. 価格情報（2025-04-17追加）
