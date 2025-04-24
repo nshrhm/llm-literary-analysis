@@ -11,54 +11,55 @@ from typing import List, Dict
 
 from kluster_batch_runner import KlusterBatchRunner
 
+import argparse
+from datetime import datetime
+from kluster_batch_runner import KlusterBatchRunner
+from parameters import DEEPSEEK_MODELS, TRIALS
+
 def main():
-    # Initialize the batch runner
+    parser = argparse.ArgumentParser(description="Run DeepSeek batch experiments")
+    parser.add_argument("--model", nargs="+", choices=list(DEEPSEEK_MODELS.keys()), help="Specify one or more models to run")
+    args = parser.parse_args()
+
     runner = KlusterBatchRunner()
 
-    # Get model definitions
-    from parameters import DEEPSEEK_MODELS, TRIALS
-
-    # Create persona-text combinations
-    personas = ["p1", "p2", "p3", "p4"]  # Personas 1-4
-    texts = ["t1", "t2", "t3"]          # Texts 1-3
-
-    # Create all combinations
+    personas = ["p1", "p2", "p3", "p4"]
+    texts = ["t1", "t2", "t3"]
     persona_texts = [(p, t) for p in personas for t in texts]
 
-    # Process each DeepSeek model
-    for model_id, model_name in DEEPSEEK_MODELS.items():
+    if args.model:
+        selected_models = {model: DEEPSEEK_MODELS[model] for model in args.model}
+    else:
+        selected_models = DEEPSEEK_MODELS
+
+    for model_id, model_name in selected_models.items():
         print(f"\nRunning batch job for {model_id}...")
-        
-        # Create batch requests for each trial
-        for trial in range(1, TRIALS + 1):  # Use TRIALS from parameters
+
+        for trial in range(1, TRIALS + 1):
             trial_num = f"n{trial:02d}"
-            
-            # Create and process batch requests
+
             requests = runner.create_batch_requests(
                 model=model_name,
                 persona_texts=persona_texts,
                 trial_num=trial_num
             )
-            
-            # Save requests and submit batch job
+
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             input_file = runner.save_batch_requests(
                 requests=requests,
                 model_type="deepseek",
                 timestamp=timestamp
             )
-            
-            # Submit and monitor job
+
             batch_request = runner.submit_batch_job(input_file)
             batch_status = runner.monitor_status(batch_request.id)
-            
-            # Save results
+
             jsonl_path, txt_paths = runner.save_results(
                 batch_status=batch_status,
                 model_type="deepseek",
                 timestamp=timestamp
             )
-            
+
             print(f"Trial {trial} complete:")
             print(f"Input file: {input_file}")
             print(f"JSONL file: {jsonl_path}")

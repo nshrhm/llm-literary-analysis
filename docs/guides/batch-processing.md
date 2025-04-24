@@ -34,7 +34,7 @@
 #### 使用方法
 ```bash
 # バッチ処理の実行
-python openai_example.py --batch
+python openai_example.py --batch [--model gpt-4.1 gpt-4.1-mini]
 
 # ステータス確認
 python openai_example.py --status <batch_id>
@@ -69,10 +69,10 @@ python claude_example.py --batch [--model claude37s claude35s]
 #### 使用方法
 ```bash
 # DeepSeekバッチ処理
-python deepseek_batch_example.py
+python deepseek_batch_example.py [--model deepseekr1 deepseekv3]
 
 # Llamaバッチ処理
-python llama_batch_example.py
+python llama_batch_example.py [--model llama4-maveric llama4-scout]
 ```
 
 ## 実装詳細

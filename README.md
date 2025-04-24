@@ -82,10 +82,10 @@ python openai_example.py --batch [--model gpt-4.1 gpt-4.1-mini]
 python claude_example.py --batch [--model claude37s claude35s]
 
 # DeepSeekバッチ処理
-python deepseek_batch_example.py
+python deepseek_batch_example.py [--model deepseekr1 deepseekv3]
 
 # Llamaバッチ処理
-python llama_batch_example.py
+python llama_batch_example.py [--model llama4-maveric llama4-scout]
 ```
 
 ### モデル選択実行（2025-04-24追加）
