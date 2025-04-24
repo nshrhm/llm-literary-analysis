@@ -2,6 +2,25 @@
 
 ## アーキテクチャパターン
 
+### モデル選択パターン（2025-04-24追加）
+```python
+def main():
+    """Run experiments with model selection."""
+    parser = argparse.ArgumentParser(description="Run experiments")
+    parser.add_argument("--model", nargs="+", 
+                       choices=list(MODELS.keys()),
+                       help="Specify one or more models to run")
+    args = parser.parse_args()
+
+    if args.model:
+        # 複数モデルの実行
+        models = {model: MODELS[model] for model in args.model}
+        print(f"Starting experiment with models: {', '.join(args.model)}")
+    else:
+        # 全モデルの実行
+        models = MODELS
+```
+
 ### バッチ処理システム（2025-04-15更新）
 ```mermaid
 graph TD
@@ -59,6 +78,34 @@ graph TD
    - 集計処理
 
 ## 実装パターン
+
+### コマンドライン制御（2025-04-24追加）
+1. モデル選択
+```python
+def create_model_selection():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model", nargs="+", 
+                       choices=list(モデル一覧.keys()),
+                       help="Specify one or more models to run")
+    return parser
+```
+
+2. モデル実行
+```python
+def run_selected_models(args, models):
+    if args.model:
+        selected = {model: models[model] for model in args.model}
+    else:
+        selected = models
+    return selected
+```
+
+3. 実行制御
+```python
+def control_execution(models):
+    for model_id, model_config in models.items():
+        run_experiment(model_id, model_config)
+```
 
 ### バッチ処理
 1. リクエスト生成
@@ -275,4 +322,3 @@ def add_converter_support(model_config):
     register_metadata_handler(model_config)
     register_content_converter(model_config)
     register_validation_rules(model_config)
-```
