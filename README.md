@@ -10,6 +10,7 @@
 - 感情分析（面白さ、驚き、悲しみ、怒り）
 - バッチ処理による効率的な実験実行（50%のコスト削減を実現）
 - 高度なパターンマッチングによる結果検証
+- モデル選択機能による柔軟な実験実行（2025-04-24追加）
 - 詳細な結果分析と可視化
 
 ## サポート対象モデル（2025-04-19更新）
@@ -70,6 +71,28 @@ python check_models.py
 ```
 
 ## 使用方法
+
+### モデル選択実行（2025-04-24追加）
+各モデルのexampleスクリプトで特定のモデルを選択実行できます：
+```bash
+# OpenAIモデルの選択実行
+python openai_example.py --model gpt-4.1 gpt-4.1-mini
+
+# Claudeモデルの選択実行
+python claude_example.py --model claude-3 claude-3-haiku
+
+# Geminiモデルの選択実行
+python gemini_example.py --model gemini20p gemini20pe
+
+# Grokモデルの選択実行
+python grok_example.py --model grok20 grok20e
+
+# DeepSeekモデルの選択実行
+python deepseek_example.py --model deepseek-r1 deepseek-v3
+
+# Llamaモデルの選択実行
+python llama_example.py --model llama70b llama405b
+```
 
 ### 基本的な使用方法
 - [機能ガイド](docs/guides/features.md)
