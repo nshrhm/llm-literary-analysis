@@ -30,11 +30,14 @@
 - バッチ処理による50%のコスト削減を実現
 - 全360実験結果の生成完了（3モデル × 4ペルソナ × 3テキスト × 10トライアル）
 
-### その他のサポートモデル
+### その他のサポートモデル（2025-04-25更新）
 - Anthropic Claude（3.7/3.5/3.0シリーズ）
 - X.AI Grok（2.0シリーズ）
 - kluster.ai DeepSeek（R1/V3シリーズ）
-- kluster.ai Meta Llama（3.3/3.1シリーズ）
+- kluster.ai Meta Llama（4.0/3.3シリーズ）
+  - チェック機能実装完了
+  - OpenAI互換APIを使用
+  - モデル可用性の簡易確認機能
 
 詳細は[モデルガイド](docs/guides/models.md)を参照してください。
 
@@ -65,9 +68,24 @@ cp .env.example .env
 # .envファイルを編集してAPIキーを設定
 ```
 
-4. モデルの可用性確認：
+4. モデルの可用性確認（2025-04-25更新）：
 ```bash
+# すべてのモデルの可用性を確認
 python check_models.py
+
+# 特定のモデルの可用性を確認
+# OpenAI
+python openai_example.py --check
+# Claude
+python claude_example.py --check
+# Gemini
+python gemini_example.py --check
+# Grok
+python grok_example.py --check
+# DeepSeek
+python deepseek_example.py --check
+# Llama（2025-04-25追加）
+python llama_example.py --check
 ```
 
 ## 使用方法

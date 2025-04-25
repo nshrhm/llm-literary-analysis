@@ -79,6 +79,40 @@ graph TD
 
 ## 実装パターン
 
+### モデルチェックパターン（2025-04-25追加）
+1. kluster.ai API連携
+```python
+def check_model_availability(client, model_name):
+    """Check model availability using kluster.ai API"""
+    try:
+        response = client.chat.completions.create(
+            model=model_name,
+            messages=[{"role": "user", "content": "test"}],
+            max_tokens=10
+        )
+        return True
+    except Exception:
+        return False
+```
+
+2. 統一的なチェック処理
+```python
+def check_models():
+    """Unified model checking process"""
+    # API key validation
+    api_key = validate_api_key()
+    if not api_key:
+        return
+    
+    # Client initialization
+    client = initialize_client(api_key)
+    
+    # Model availability check
+    for model_id, model_name in models.items():
+        status = check_model_availability(client, model_name)
+        display_status(model_id, model_name, status)
+```
+
 ### コマンドライン制御（2025-04-24追加）
 1. モデル選択
 ```python

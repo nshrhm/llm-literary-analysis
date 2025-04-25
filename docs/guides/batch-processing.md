@@ -61,18 +61,35 @@ python claude_example.py --batch [--model claude37s claude35s]
 
 ### kluster.ai
 
-#### DeepSeek & Llama
-- OpenAI互換APIインターフェース
-- バッチ処理サポート
-- 24時間処理ウィンドウ
+#### DeepSeek & Llama（2025-04-25更新）
+1. DeepSeekモデル
+   - OpenAI互換APIインターフェース
+   - バッチ処理サポート
+   - 24時間処理ウィンドウ
+
+2. Llamaモデル
+   - OpenAI互換APIインターフェース（kluster.ai API）
+   - バッチ処理サポート
+   - 24時間処理ウィンドウ
+   - モデルチェック機能との連携
+     - 事前の可用性確認
+     - APIキー設定の検証
+     - テストリクエストによる動作確認
 
 #### 使用方法
 ```bash
 # DeepSeekバッチ処理
 python deepseek_batch_example.py [--model deepseekr1 deepseekv3]
 
-# Llamaバッチ処理
+# Llamaバッチ処理（2025-04-25更新）
+# モデル可用性確認
+python llama_example.py --check
+
+# バッチ処理実行
 python llama_batch_example.py [--model llama4-maveric llama4-scout]
+
+# 統合テスト
+python llama_example.py --check --batch
 ```
 
 ## 実装詳細

@@ -38,12 +38,27 @@
 | deepseekv3 | deepseek-ai/DeepSeek-V3 | V3シリーズ |
 | deepseekv3-0324 | deepseek-ai/DeepSeek-V3-0324 | V3シリーズ（0324更新版） |
 
-### Meta Llamaモデル
+### Meta Llamaモデル（2025-04-25更新）
 | モデルID | 正式名称 | 説明 |
 |----------|----------|------|
 | llama4-maveric | meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8 | Maverick 17B |
 | llama4-scout | meta-llama/Llama-4-Scout-17B-16E-Instruct | Scout 17B |
 | llama33-70Bit | klusterai/Meta-Llama-3.3-70B-Instruct-Turbo | 70B Instruct Turbo |
+
+#### モデルチェック機能
+- KLUSTERAI_API_KEYによる認証
+- OpenAI互換インターフェースを使用
+- シンプルなテストリクエストによる可用性確認
+- バッチ処理との統合テスト機能
+
+#### チェック方法
+```bash
+# すべてのモデルをチェック
+python check_models.py
+
+# Llamaモデルのみをチェック
+python llama_example.py --check
+```
 
 ## 使用例
 複数のモデルを選択して実行する場合：
@@ -157,10 +172,18 @@ python claude_example.py --batch --model claude37s claude35s
    - メモリ使用量の最適化
    - 並列処理の制御
 
-### DeepSeek & Llama
-- OpenAI互換APIインターフェース
-- 24時間処理ウィンドウ
-- バッチサイズの最適化が必要
+### DeepSeek & Llama（2025-04-25更新）
+1. DeepSeekモデル
+   - OpenAI互換APIインターフェース
+   - 24時間処理ウィンドウ
+   - バッチサイズの最適化が必要
+
+2. Llamaモデル
+   - OpenAI互換APIインターフェース（kluster.ai API）
+   - モデルチェック機能による可用性確認
+   - 24時間処理ウィンドウ
+   - バッチサイズの最適化が必要
+   - KLUSTERAI_API_KEYが必要
 
 ## 将来の拡張計画
 - プロバイダー非依存のモデル選択機能実装予定
