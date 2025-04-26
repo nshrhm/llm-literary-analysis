@@ -72,7 +72,12 @@ def main():
             if args.batch:
                 print("Using batch processing (50% cost reduction enabled)...")
                 runner = ClaudeBatchRunner()
-                runner.run_batch_experiment(models)
+                # バッチ処理時もモデル選択を反映
+                if args.model:
+                    selected_models = {model: CLAUDE_MODELS[model] for model in args.model}
+                    runner.run_batch_experiment(selected_models)
+                else:
+                    runner.run_batch_experiment()  # すべてのモデルを使用
             else:
                 runner = ClaudeExperimentRunner()
                 runner.run_experiment(models)

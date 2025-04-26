@@ -6,6 +6,7 @@ from datetime import datetime
 from anthropic import Anthropic
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 from anthropic.types.messages.batch_create_params import Request
+from prompt_manager import PromptManager
 
 class ClaudeBatchRunner:
     """Handles Claude batch processing experiments."""
@@ -38,14 +39,15 @@ class ClaudeBatchRunner:
                 # カスタムIDを生成
                 custom_id = f"{text_id}_{model_id}_{persona_id}_temp{int(temp_value*100)}_01"
                 
-                # Create request
+                # PromptManagerから得た各パーツを正しく展開
                 request = Request(
                     custom_id=custom_id,
                     params=MessageCreateParamsNonStreaming(
                         model=model_config,  # CLAUDEモデルは直接モデル名を使用
                         max_tokens=1024,
                         temperature=temp_value,
-                        **prompt
+                        system=prompt["system"],  # systemプロンプト
+                        messages=prompt["messages"]  # メッセージ配列
                     )
                 )
                 requests.append(request)
@@ -101,8 +103,8 @@ class ClaudeBatchRunner:
                             message = result.result.message
                             content = message.content[0].text
                             
-                            # Import temperature parameter
-                            from parameters import TEMPERATURE
+                            # Temperature値をcustom_idから抽出
+                            temp = int(custom_id.split('_')[3].replace('temp', '')) / 100
                             
                             # Save in txt format
                             output_file = f"results/claude/{custom_id}.txt"
@@ -112,7 +114,7 @@ class ClaudeBatchRunner:
                                 f.write(f"persona: {persona_id}\n")
                                 f.write(f"model: {model_id}\n")
                                 f.write(f"trial: {trial}\n")
-                                f.write(f"temperature: {TEMPERATURE}\n")
+                                f.write(f"temperature: {temp}\n")
                                 f.write(f"text: {text_id}\n")
                                 # Write content
                                 f.write(f"\n{content}\n")
@@ -142,16 +144,21 @@ class ClaudeBatchRunner:
             
             print(f"Results processing completed for model {model_id}")
     
-    def run_batch_experiment(self):
-        """Run the batch experiment."""
+    def run_batch_experiment(self, models=None):
+        """Run the batch experiment.
+        
+        Args:
+            models: Dictionary of models to process. If None, uses all CLAUDE_MODELS.
+        """
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             
-            # Get supported Claude models from parameters
+            # Get supported Claude models from parameters if none specified
             from parameters import CLAUDE_MODELS
+            models = models or CLAUDE_MODELS
             
-            print(f"Starting batch processing for {len(CLAUDE_MODELS)} models...")
-            for model_id, model_config in CLAUDE_MODELS.items():
+            print(f"Starting batch processing for {len(models)} models...")
+            for model_id, model_config in models.items():
                 print(f"\nProcessing model: {model_id}")
                 
                 try:
