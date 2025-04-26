@@ -192,11 +192,40 @@ temperature: [温度値 or None]
    - 入力: batch_results/<batch_id>_output.jsonl
    - 出力: results/openai/*.txt
 
-### Claude API
+### Claude API（2025-04-25更新）
 1. Message Batches API
    - 最大100,000リクエスト
    - 29日間の結果保持
    - スロットリング: 100リクエスト/分
+
+2. PromptManager統合
+   ```python
+   # コンテンツ形式の生成
+   prompt = PromptManager.get_prompt(
+       model_type="claude",
+       persona_id=persona_id,
+       text_content=text_content,
+       text_id=text_id,
+       model_id=model_id
+   )
+
+   # Claudeバッチリクエスト形式
+   request = Request(
+       custom_id=custom_id,
+       params=MessageCreateParamsNonStreaming(
+           model=model_config,
+           system=prompt["system"],
+           messages=prompt["messages"],
+           temperature=temp_value
+       )
+   )
+   ```
+
+3. バッチ処理の最適化
+   - システム/ユーザーメッセージの分離
+   - 温度制御の統一管理
+   - カスタムIDの標準化
+   - メタデータの一貫性確保
 
 2. 標準機能
    - temperature
