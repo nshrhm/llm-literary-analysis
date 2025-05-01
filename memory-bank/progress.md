@@ -2,6 +2,19 @@
 
 ## 完了した機能
 
+### OpenAIモデルドキュメントの追加（2025-05-01追加）
+1. ドキュメント更新
+   - 'docs/guides/models.md' に OpenAI モデルの情報を追加
+   - モデルID、正式名称、説明を含む表形式での記載
+   - 使用例とバッチ処理コマンドの追加
+   - 推論モデルの制約事項を明記
+
+### temperature_support の問題解決（2025-05-01追加）
+1. コード修正
+   - 'parameters.py' の OPENAI_MODELS に gpt-4o と gpt-4o-mini に対して "temperature_support": True を追加
+   - 'experiment_runner.py' の OpenAIExperimentRunner クラスに temperature_support をチェックするロジックを追加
+   - 結果ファイルに temperature が正しく記録されるように修正
+
 ### batch_result_converterの改善（2025-04-30追加）
 1. ファイル出力の標準化
    - pattern_matchingセクションの削除
@@ -97,9 +110,14 @@
    - モデル別の結果集計
    - エラー追跡と検証
 
+3. 形式の統一（2025-05-01追加）
+   - `persona` と `text` フィールドを識別子形式（p1, t1 など）に変更
+   - パラメータ順序を統一（timestamp, text, model, persona, temperature, trial）
+   - すべての実験ランナー（Gemini、Grok、Claude など）に適用
+
 ## 進行中の機能
 
-### モデル実験の展開（2025-04-19更新）
+### モデル実験の展開（2025-05-01更新）
 1. Claude実験の準備
    - Message Batches APIの設定
    - バッチ処理の最適化
@@ -115,6 +133,10 @@
    - 70B/405B/8Bモデルの比較実験
    - バッチ処理の効率化
    - 処理時間の最適化
+
+4. ドキュメントの整合性確保
+   - 他のモデルのドキュメント更新
+   - README.md やその他のガイドとの一貫性確認
 
 ### バッチ処理の改善
 1. 自動化

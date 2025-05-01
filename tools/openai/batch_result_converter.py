@@ -162,10 +162,9 @@ def write_result_file(output_file: str, metadata: Dict, content: str, validation
         f.write(f"persona: {metadata['persona']}\n")
         f.write(f"trial: {metadata['trial']}\n")  # Add trial information
         
-        # Write temperature and pricing info for GPT-4.1 series
-        if pricing := get_model_pricing(metadata['model']):
-            f.write(f"temperature: {metadata.get('temperature', '0.7')}\n")  # Default to 0.7
-            f.write(f"pricing: {json.dumps(pricing, indent=2)}\n")
+        # Write temperature info
+        if 'temperature' in metadata and metadata['temperature'] is not None:
+            f.write(f"temperature: {metadata['temperature']}\n")
         else:
             f.write(f"temperature: None\n")  # reasoningタイプのモデル
         

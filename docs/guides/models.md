@@ -45,6 +45,19 @@
 | llama4-scout | meta-llama/Llama-4-Scout-17B-16E-Instruct | Scout 17B |
 | llama33-70Bit | klusterai/Meta-Llama-3.3-70B-Instruct-Turbo | 70B Instruct Turbo |
 
+### OpenAIモデル
+| モデルID | 正式名称 | 説明 |
+|----------|----------|------|
+| gpt-4.1 | gpt-4.1 | 高精度解析向け（高コスト） |
+| gpt-4.1-mini | gpt-4.1-mini | 一般的な解析タスク向け（中コスト） |
+| gpt-4.1-nano | gpt-4.1-nano | 軽量な解析に最適（低コスト） |
+| gpt-4o | gpt-4o | テキスト生成モデル |
+| gpt-4o-mini | gpt-4o-mini | テキスト生成モデル（軽量版） |
+| o4-mini | o4-mini | 推論モデル |
+| o3 | o3 | 推論モデル |
+| o3-mini | o3-mini | 推論モデル（軽量版） |
+| o1-mini | o1-mini | 推論モデル（軽量版） |
+
 #### モデルチェック機能
 - KLUSTERAI_API_KEYによる認証
 - OpenAI互換インターフェースを使用
@@ -77,11 +90,16 @@ python deepseek_example.py --model deepseekr1 deepseekv3
 
 # Llamaモデルの場合
 python llama_example.py --model llama4-maveric llama4-scout
+
+# OpenAIモデルの場合
+python openai_example.py --model gpt-4.1 gpt-4.1-mini
 ```
 
 バッチ処理と組み合わせる場合：
 ```bash
 python claude_example.py --batch --model claude37s claude35s
+
+python openai_example.py --batch --model gpt-4.1 gpt-4.1-mini
 ```
 
 ## サポート対象モデル
@@ -154,6 +172,12 @@ python claude_example.py --batch --model claude37s claude35s
 
 2. o1-mini
    - システムロール非対応
+   - 温度パラメータ（temperature）非対応
+
+3. o4-mini
+   - 温度パラメータ（temperature）非対応
+
+4. o3
    - 温度パラメータ（temperature）非対応
 
 ### Claude

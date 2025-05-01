@@ -87,9 +87,9 @@ class BaseExperimentRunner:
         # Generate filename based on whether temperature should be included
         if params.get('use_temperature', True):
             temp_value = params.get('temperature', 0.5)  # デフォルト値として0.5を使用
-            filename = f"{params['text_key']}_{params['model_key']}_{params['persona_key']}_temp{int(temp_value*100):02d}_{params['trial']:02d}.txt"
+            filename = f"{params['text_key']}_{params['model_key']}_{params['persona_key']}_temp{int(temp_value*100)}_{int(params['trial'])}.txt"
         else:
-            filename = f"{params['text_key']}_{params['model_key']}_{params['persona_key']}_temp--_{params['trial']:02d}.txt"
+            filename = f"{params['text_key']}_{params['model_key']}_{params['persona_key']}_temp--_{int(params['trial'])}.txt"
         
         filepath = os.path.join(self.results_dir, filename)
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -107,9 +107,9 @@ class BaseExperimentRunner:
         # Build content list
         content_parts = [
             f"timestamp: {timestamp}",
-            f"persona: {params['persona']}",
+            f"text: {params['text_key']}",
             f"model: {params['model']}",
-            f"trial: {params['trial']}"
+            f"persona: {params['persona_key']}",
         ]
         
         # Add temperature only if it should be included
@@ -119,7 +119,7 @@ class BaseExperimentRunner:
         
         # Add remaining content
         content_parts.extend([
-            f"text: {params['text_name']}",
+            f"trial: {int(params['trial'])}",
             f"Q1value: {q1_value}",
             f"Q1reason: {q1_reason}",
             f"Q2value: {q2_value}",
@@ -495,9 +495,9 @@ class OpenAIExperimentRunner(BaseExperimentRunner):
                                 "persona": persona_info["name"],
                                 "text_name": text_info["name"],
                                 "model": model_name,
-                                "use_temperature": model_info["type"] == "text_generation"
+                                "use_temperature": model_info.get("temperature_support", False)
                             }
-                            if model_info["type"] == "text_generation":
+                            if model_info.get("temperature_support", False):
                                 params["temperature"] = temp_value
                             
                             self.save_result(response.choices[0].message.content, params)

@@ -1,6 +1,12 @@
 # アクティブコンテキスト
 
-## 現在の焦点（2025-04-25更新）
+## 現在の焦点（2025-05-01更新）
+
+### OpenAIモデルドキュメントの追加
+- 'docs/guides/models.md' に OpenAI モデルの情報を追加
+- モデルID、正式名称、説明を含む表形式での記載
+- 使用例とバッチ処理コマンドの追加
+- 推論モデルの制約事項を明記
 
 ### Llamaモデルチェック機能の実装完了
 - check_models.pyにLlamaモデルのチェック機能を追加
@@ -61,6 +67,20 @@
    - 温度パラメータの正常な記録
    - 価格情報の追跡と分析
 
+### 結果ファイル形式の統一（2025-05-01追加）
+1. 識別子形式への変更
+   - `persona` と `text` フィールドを識別子形式（p1, t1 など）に変更
+   - すべての実験ランナー（Gemini、Grok、Claude など）に適用
+
+2. パラメータ順序の統一
+   - 結果ファイルのパラメータ順序を以下のように統一：
+     - timestamp
+     - text
+     - model
+     - persona
+     - temperature (条件付き)
+     - trial
+
 ### 次のステップ：他モデルへの展開
 
 1. Claude実験の開始
@@ -78,6 +98,15 @@
    - 3つのモデルサイズ（70B, 405B, 8B）での評価
    - kluster.ai経由でのバッチ処理
    - 24時間処理ウィンドウの最適化
+
+4. ドキュメントの整合性確保
+   - 他のモデルのドキュメント更新
+   - README.md やその他のガイドとの一貫性確認
+
+5. temperature_support の問題解決（2025-05-01追加）
+   - 'parameters.py' の OPENAI_MODELS に gpt-4o と gpt-4o-mini に対して "temperature_support": True を追加
+   - 'experiment_runner.py' の OpenAIExperimentRunner クラスに temperature_support をチェックするロジックを追加
+   - 結果ファイルに temperature が正しく記録されるように修正
 
 ## 実装の改善点
 

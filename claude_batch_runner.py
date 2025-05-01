@@ -21,7 +21,7 @@ class ClaudeBatchRunner:
         os.makedirs("results/claude/batch_errors", exist_ok=True)
         os.makedirs("results/claude", exist_ok=True)
         
-    def _create_batch_requests(self, model_id, model_config, timestamp):
+    def _create_batch_requests(self, model_id, model_config, timestamp, num_trials=10):
         """Create batch requests for Claude API."""
         from parameters import TEXT_CONTENT, PERSONAS, TEXTS
         
@@ -36,21 +36,24 @@ class ClaudeBatchRunner:
                 # temperatureを取得
                 temp_value = prompt.get("temperature", 0.5)
                 
-                # カスタムIDを生成
-                custom_id = f"{text_id}_{model_id}_{persona_id}_temp{int(temp_value*100)}_01"
-                
-                # PromptManagerから得た各パーツを正しく展開
-                request = Request(
-                    custom_id=custom_id,
-                    params=MessageCreateParamsNonStreaming(
-                        model=model_config,  # CLAUDEモデルは直接モデル名を使用
-                        max_tokens=1024,
-                        temperature=temp_value,
-                        system=prompt["system"],  # systemプロンプト
-                        messages=prompt["messages"]  # メッセージ配列
+                # 試行回数分ループ
+                for trial in range(1, num_trials + 1):
+                    trial_str = f"{trial:02d}"
+                    # カスタムIDを生成
+                    custom_id = f"{text_id}_{model_id}_{persona_id}_temp{int(temp_value*100)}_{trial_str}"
+                    
+                    # PromptManagerから得た各パーツを正しく展開
+                    request = Request(
+                        custom_id=custom_id,
+                        params=MessageCreateParamsNonStreaming(
+                            model=model_config,  # CLAUDEモデルは直接モデル名を使用
+                            max_tokens=1024,
+                            temperature=temp_value,
+                            system=prompt["system"],  # systemプロンプト
+                            messages=prompt["messages"]  # メッセージ配列
+                        )
                     )
-                )
-                requests.append(request)
+                    requests.append(request)
         
         return requests
     
@@ -144,11 +147,12 @@ class ClaudeBatchRunner:
             
             print(f"Results processing completed for model {model_id}")
     
-    def run_batch_experiment(self, models=None):
+    def run_batch_experiment(self, models=None, num_trials=10):
         """Run the batch experiment.
         
         Args:
             models: Dictionary of models to process. If None, uses all CLAUDE_MODELS.
+            num_trials: Number of trials to run for each combination.
         """
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -157,13 +161,13 @@ class ClaudeBatchRunner:
             from parameters import CLAUDE_MODELS
             models = models or CLAUDE_MODELS
             
-            print(f"Starting batch processing for {len(models)} models...")
+            print(f"Starting batch processing for {len(models)} models with {num_trials} trials each...")
             for model_id, model_config in models.items():
                 print(f"\nProcessing model: {model_id}")
                 
                 try:
                     # Create batch requests
-                    requests = self._create_batch_requests(model_id, model_config, timestamp)
+                    requests = self._create_batch_requests(model_id, model_config, timestamp, num_trials)
                     print(f"Created {len(requests)} requests")
                     
                     # Create batch

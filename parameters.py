@@ -159,6 +159,7 @@ OPENAI_MODELS = {
     "gpt-4o": {
         "model_name": "gpt-4o",
         "type": "text_generation",
+        "temperature_support": True,
         "pricing": {
             "input": 2.50,
             "cached_input": 1.25,
@@ -169,6 +170,7 @@ OPENAI_MODELS = {
     "gpt-4o-mini": {
         "model_name": "gpt-4o-mini",
         "type": "text_generation",
+        "temperature_support": True,
         "pricing": {
             "input": 0.15,
             "cached_input": 0.075,
