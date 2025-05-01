@@ -15,6 +15,12 @@
    - 'experiment_runner.py' の OpenAIExperimentRunner クラスに temperature_support をチェックするロジックを追加
    - 結果ファイルに temperature が正しく記録されるように修正
 
+### CSVファイルへの「developer」列追加（2025-05-01追加）
+1. コード更新
+   - `aggregate_experiment_results.py`を更新し、CSVファイルに「developer」列を追加
+   - この列は`text`と`model`の間に配置され、モデル名に基づいて開発元（OpenAI, Google, Anthropic, xAI, DeepSeek, Meta, Alibaba）を正確に判定して表示
+   - 判定には`parameters.py`のモデル定義を参照するロジックを導入
+
 ### batch_result_converterの改善（2025-04-30追加）
 1. ファイル出力の標準化
    - pattern_matchingセクションの削除

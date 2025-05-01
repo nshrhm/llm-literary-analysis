@@ -81,6 +81,11 @@
      - temperature (条件付き)
      - trial
 
+### 最近の作業：CSVファイルへの「developer」列追加（2025-05-01追加）
+- `aggregate_experiment_results.py`を更新し、CSVファイルに「developer」列を追加
+- この列は`text`と`model`の間に配置され、モデル名に基づいて開発元（OpenAI, Google, Anthropic, xAI, DeepSeek, Meta, Alibaba）を正確に判定して表示
+- 判定には`parameters.py`のモデル定義を参照するロジックを導入
+
 ### 次のステップ：他モデルへの展開
 
 1. Claude実験の開始

@@ -75,6 +75,12 @@ MODEL_CONFIGS = {
             "max_tokens": 1024,
             "format": "messages"
         }
+    },
+    "qwen": {
+        "standard": {
+            "max_tokens": 1024,
+            "format": "messages"
+        }
     }
 }
 
@@ -281,6 +287,32 @@ LLAMA_MODELS = {
     # "llama31-8Bit": "klusterai/Meta-Llama-3.1-8B-Instruct-Turbo"
 }
 
+# Qwen model definitions
+QWEN_MODELS = {
+    "qwen3": {
+        "model_name": "Qwen/Qwen3-235B-A22B-FP8",
+        "type": "text_generation",
+        "temperature_support": True,
+        "pricing": {
+            "input": 0.15,
+            "cached_input": 0.0375,
+            "output": 2.00
+        },
+        "endpoint": "https://api.kluster.ai/v1"
+    },
+    "qwen2.5": {
+        "model_name": "Qwen/Qwen2.5-VL-7B-Instruct",
+        "type": "text_generation",
+        "temperature_support": True,
+        "pricing": {
+            "input": 0.30,
+            "cached_input": 0.075,
+            "output": 0.30
+        },
+        "endpoint": "https://api.kluster.ai/v1"
+    }
+}
+
 # Experiment parameters
 TRIALS = 10  # 試行回数を10回に設定
 
@@ -293,7 +325,8 @@ MODEL_TYPES = {
   "gemini": GEMINI_MODELS,
   "grok": GROK_MODELS,
   "deepseek": DEEPSEEK_MODELS,
-  "llama": LLAMA_MODELS
+  "llama": LLAMA_MODELS,
+  "qwen": QWEN_MODELS
 }
 
 # Text content definitions

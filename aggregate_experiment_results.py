@@ -4,6 +4,7 @@ import re
 import argparse
 from datetime import datetime
 from pathlib import Path
+from parameters import OPENAI_MODELS, CLAUDE_MODELS, GEMINI_MODELS, GROK_MODELS, DEEPSEEK_MODELS, LLAMA_MODELS, QWEN_MODELS
 
 def extract_q_data(text, line_index=None):
     """Extract Q value and reason from text content.
@@ -49,6 +50,24 @@ def extract_q_data(text, line_index=None):
     
     return None
 
+def get_developer(model):
+    """Determine the developer based on the model name using parameters.py definitions"""
+    model = model.split('/')[-1] if '/' in model else model
+    for model_dict, developer in [
+        (OPENAI_MODELS, 'OpenAI'),
+        (CLAUDE_MODELS, 'Anthropic'),
+        (GEMINI_MODELS, 'Google'),
+        (GROK_MODELS, 'xAI'),
+        (DEEPSEEK_MODELS, 'DeepSeek'),
+        (LLAMA_MODELS, 'Meta'),
+        (QWEN_MODELS, 'Alibaba')
+    ]:
+        if any(model_id in model_dict and (model == model_dict[model_id] or model == model_id) for model_id in model_dict):
+            return developer
+    if model.startswith('DeepSeek'):
+        return 'DeepSeek'
+    return 'Unknown'
+
 def process_file(filepath):
     """Process a single result file and extract relevant data"""
     try:
@@ -63,6 +82,7 @@ def process_file(filepath):
             'timestamp': None,
             'persona': None,
             'model': None,
+            'developer': None,
             'trial': None,
             'temperature': None,
             'text': None,
@@ -94,6 +114,7 @@ def process_file(filepath):
                     data['model'] = model
                 else:
                     data['model'] = model.split('/')[-1] if '/' in model else model
+                data['developer'] = get_developer(data['model'])
             elif line.startswith('trial:'):
                 data['trial'] = line.replace('trial:', '').strip()
             elif line.startswith('temperature:'):
@@ -149,7 +170,7 @@ def main():
     output_file = output_path / generate_output_filename(args.input_dir)
     
     # CSVヘッダーの設定
-    headers = ['timestamp', 'text', 'model', 'persona', 'temperature', 'trial', 
+    headers = ['timestamp', 'text', 'developer', 'model', 'persona', 'temperature', 'trial', 
               'Q1value', 'Q2value', 'Q3value', 'Q4value',
               'Q1reason', 'Q2reason', 'Q3reason', 'Q4reason']
     

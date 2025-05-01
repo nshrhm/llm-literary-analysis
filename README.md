@@ -69,25 +69,6 @@ cp .env.example .env
 # .envファイルを編集してAPIキーを設定
 ```
 
-4. モデルの可用性確認（2025-04-25更新）：
-```bash
-# すべてのモデルの可用性を確認
-python check_models.py
-
-# 特定のモデルの可用性を確認
-# OpenAI
-python openai_example.py --check
-# Claude
-python claude_example.py --check
-# Gemini
-python gemini_example.py --check
-# Grok
-python grok_example.py --check
-# DeepSeek
-python deepseek_example.py --check
-# Llama（2025-04-25追加）
-python llama_example.py --check
-```
 
 ## 使用方法
 

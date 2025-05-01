@@ -87,9 +87,9 @@ class BaseExperimentRunner:
         # Generate filename based on whether temperature should be included
         if params.get('use_temperature', True):
             temp_value = params.get('temperature', 0.5)  # デフォルト値として0.5を使用
-            filename = f"{params['text_key']}_{params['model_key']}_{params['persona_key']}_temp{int(temp_value*100)}_{int(params['trial'])}.txt"
+            filename = f"{params['text_key']}_{params['model_key']}_{params['persona_key']}_temp{int(temp_value*100)}_{int(params['trial']):02d}.txt"
         else:
-            filename = f"{params['text_key']}_{params['model_key']}_{params['persona_key']}_temp--_{int(params['trial'])}.txt"
+            filename = f"{params['text_key']}_{params['model_key']}_{params['persona_key']}_temp--_{int(params['trial']):02d}.txt"
         
         filepath = os.path.join(self.results_dir, filename)
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -539,6 +539,68 @@ class LlamaExperimentRunner(BaseExperimentRunner):
                 for text_key, text_info in TEXTS.items():
                     text_content = TEXT_CONTENT[text_key]
                     prompt = PromptManager.get_prompt("llama", persona_key, text_content, text_key, model_key)
+                    
+                    for trial in range(1, TRIALS + 1):
+                        try:
+                            # ペルソナと文章タイプに基づいて温度を計算
+                            base_temp = PERSONAS[persona_key]["base_temperature"]
+                            temp_modifier = TEXTS[text_key]["temperature_modifier"]
+                            temperature = base_temp + temp_modifier
+
+                            response = self.client.chat.completions.create(
+                                model=model_name,
+                                max_tokens=1000,
+                                temperature=temperature,
+                                messages=prompt["messages"]
+                            )
+                            
+                            params = {
+                                "persona_key": persona_key,
+                                "text_key": text_key,
+                                "model_key": model_key,
+                                "trial": trial,
+                                "persona": persona_info["name"],
+                                "text_name": text_info["name"],
+                                "model": model_name,
+                                "temperature": temperature
+                            }
+                            
+                            self.save_result(response.choices[0].message.content, params)
+                            print(f"Completed: {params['text_key']}_{params['model_key']}_{params['persona_key']}_temp{int(params['temperature']*100):02d}_{trial:02d}")
+                            
+                        except Exception as e:
+                            print(f"Error in trial {trial} with {model_name}: {str(e)}")
+                            continue
+
+class QwenExperimentRunner(BaseExperimentRunner):
+    """Experiment runner for Qwen models."""
+    
+    def get_model_type(self) -> str:
+        return "qwen"
+
+    def __init__(self):
+        """Initialize the Qwen experiment runner."""
+        super().__init__()
+        self._setup_api()
+
+    def _setup_api(self):
+        """Set up the Qwen API via Kluster.ai."""
+        api_key = os.environ.get("KLUSTERAI_API_KEY")
+        if not api_key:
+            raise ValueError("Missing KLUSTERAI_API_KEY environment variable")
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.kluster.ai/v1"
+        )
+
+    def run_experiment(self):
+        """Run the experiment with Qwen models."""
+        for model_key, model_info in QWEN_MODELS.items():
+            model_name = model_info["model_name"]
+            for persona_key, persona_info in PERSONAS.items():
+                for text_key, text_info in TEXTS.items():
+                    text_content = TEXT_CONTENT[text_key]
+                    prompt = PromptManager.get_prompt("qwen", persona_key, text_content, text_key, model_key)
                     
                     for trial in range(1, TRIALS + 1):
                         try:

@@ -44,7 +44,7 @@ def main():
     parser.add_argument("--status", help="Check status of batch job")
     parser.add_argument("--cancel", help="Cancel batch job")
     parser.add_argument("--model", nargs="+", 
-                       choices=list(CLAUDE_MODELS.keys()),
+                       choices=list(CLAUDE_MODELS.values()),
                        help="Specify one or more models to run")
     args = parser.parse_args()
     
@@ -62,11 +62,11 @@ def main():
             # Select models to run
             if args.model:
                 # 複数モデルの実行
-                models = {model: CLAUDE_MODELS[model] for model in args.model}
+                models = {model.split('-')[-1]: model for model in args.model}
                 print(f"Starting Claude experiment with models: {', '.join(args.model)}")
             else:
                 # 全モデルの実行
-                models = CLAUDE_MODELS
+                models = {k.split('-')[-1]: v for k, v in CLAUDE_MODELS.items()}
                 print(f"Starting Claude experiment with {len(CLAUDE_MODELS)} models...")
             
             if args.batch:

@@ -43,11 +43,11 @@ class KlusterBatchRunner:
         Returns:
             str: Model identifier
         """
-        from parameters import DEEPSEEK_MODELS, LLAMA_MODELS
+        from parameters import DEEPSEEK_MODELS, LLAMA_MODELS, QWEN_MODELS
 
         # Check DeepSeek models
-        for model_id, model_path in DEEPSEEK_MODELS.items():
-            if model_path == model:
+        for model_id, model_info in DEEPSEEK_MODELS.items():
+            if model_info["model_name"] == model:
                 if model_id == "deepseekr1":
                     return "deepseekr1"
                 elif model_id == "deepseekv3":
@@ -57,8 +57,13 @@ class KlusterBatchRunner:
                 return model_id
 
         # Check Llama models
-        for model_id, model_path in LLAMA_MODELS.items():
-            if model_path == model:
+        for model_id, model_info in LLAMA_MODELS.items():
+            if model_info["model_name"] == model:
+                return model_id
+
+        # Check Qwen models
+        for model_id, model_info in QWEN_MODELS.items():
+            if model_info["model_name"] == model:
                 return model_id
 
         # Default to base name if not found
@@ -74,11 +79,11 @@ class KlusterBatchRunner:
         Returns:
             str: Display name for the model
         """
-        from parameters import DEEPSEEK_MODELS, LLAMA_MODELS
+        from parameters import DEEPSEEK_MODELS, LLAMA_MODELS, QWEN_MODELS
 
         # Check DeepSeek models
-        for model_id, model_path in DEEPSEEK_MODELS.items():
-            if model_path == model:
+        for model_id, model_info in DEEPSEEK_MODELS.items():
+            if model_info["model_name"] == model:
                 if model_id == "deepseekr1":
                     return "DeepSeek-R1"
                 elif model_id == "deepseekv3":
@@ -87,8 +92,8 @@ class KlusterBatchRunner:
                     return "DeepSeek-V3-0324"
 
         # Check Llama models
-        for model_id, model_path in LLAMA_MODELS.items():
-            if model_path == model:
+        for model_id, model_info in LLAMA_MODELS.items():
+            if model_info["model_name"] == model:
                 if model_id == "llama4-maveric":
                     return "Llama-4-Maverick-17B"
                 elif model_id == "llama4-scout":
@@ -99,6 +104,14 @@ class KlusterBatchRunner:
                 #     return "Llama-3.1-405B"
                 # elif model_id == "llama31-8Bit":
                 #     return "Llama-3.1-8B"
+
+        # Check Qwen models
+        for model_id, model_info in QWEN_MODELS.items():
+            if model_info["model_name"] == model:
+                if model_id == "qwen3":
+                    return "Qwen3-235B"
+                elif model_id == "qwen2.5":
+                    return "Qwen2.5-VL-7B"
 
         # Default to full path if not found
         return model
@@ -361,6 +374,8 @@ class KlusterBatchRunner:
             model_type = "deepseek"
         elif "llama" in model.lower():
             model_type = "llama"
+        elif "qwen" in model.lower():
+            model_type = "qwen"
         else:
             raise ValueError("Unsupported model type")
 

@@ -40,7 +40,7 @@ class ClaudeBatchRunner:
                 for trial in range(1, num_trials + 1):
                     trial_str = f"{trial:02d}"
                     # カスタムIDを生成
-                    custom_id = f"{text_id}_{model_id}_{persona_id}_temp{int(temp_value*100)}_{trial_str}"
+                    custom_id = f"{text_id}_{model_config}_{persona_id}_temp{int(temp_value*100)}_{trial_str}"
                     
                     # PromptManagerから得た各パーツを正しく展開
                     request = Request(
@@ -98,7 +98,7 @@ class ClaudeBatchRunner:
                             # Parse custom_id: text_model_persona_temp{value}_trial
                             parts = custom_id.split("_")
                             text_id = parts[0]
-                            model_id = parts[1]
+                            model_id = parts[1].split('-')[-1] if '-' in parts[1] else parts[1]
                             persona_id = parts[2]
                             trial = parts[4]
                             
@@ -115,7 +115,7 @@ class ClaudeBatchRunner:
                                 # Write metadata
                                 f.write(f"timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
                                 f.write(f"persona: {persona_id}\n")
-                                f.write(f"model: {model_id}\n")
+                                f.write(f"model: {model_config}\n")
                                 f.write(f"trial: {trial}\n")
                                 f.write(f"temperature: {temp}\n")
                                 f.write(f"text: {text_id}\n")
@@ -145,7 +145,7 @@ class ClaudeBatchRunner:
                 except Exception as e:
                     print(f"Error processing result for {custom_id}: {str(e)}")
             
-            print(f"Results processing completed for model {model_id}")
+            print(f"Results processing completed for model {model_config}")
     
     def run_batch_experiment(self, models=None, num_trials=10):
         """Run the batch experiment.
@@ -181,7 +181,7 @@ class ClaudeBatchRunner:
                         self._save_results(status, timestamp, model_id)
                     
                 except Exception as e:
-                    print(f"Error processing model {model_id}: {str(e)}")
+                    print(f"Error processing model {model_config}: {str(e)}")
                     continue
                 
             print("\nBatch processing completed for all models!")
